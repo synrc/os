@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="SEC-LINE OS Technical Whitepaper" />
 <meta name="author" content="SEC-LINE Engineering Group" />
-<title>SEC-LINE OS</title>
+<title>SEC-LINE</title>
 <link rel="stylesheet" href="https://n2o.dev/blank.css" />
 <link rel="stylesheet" href="https://n2o.dev/nato.css" />
 <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
@@ -18,11 +18,11 @@
 <body>
 <nav>
   <a href="https://github.com/bitedits/">BITEDITS</a>
-  <a href="#" style="background:#ededed;">SEC-LINE OS</a>
+  <a href="#" style="background:#ededed;">SEC-LINE</a>
 </nav>
 <header>
   <a href="https://github.com/bitedits"><img src="https://n2o.dev/img/2B55.svg" /></a>
-  <h1>SEC-LINE OS</h1>
+  <h1>SEC-LINE</h1>
 </header>
 <aside>
   <article>
@@ -73,6 +73,15 @@
   </section>
 
   <section>
+    <a name="time"></a><h3>Time</h3>
+    <p>Accurate, cryptographic synchronization is paramount to securing a zero-trust architecture. Chrony serves as an isolated NTP client ensuring that system timestamps remain rigorously validated against network tampering.</p>
+    <ul>
+      <li><b><a href="https://chrony-project.org">Chrony</a></b> — Upstream Project</li>
+      <li><b><a href="https://github.com/mlichvar/chrony">mlichvar/chrony</a></b> — Source Code</li>
+    </ul>
+  </section>
+
+  <section>
     <a name="packages"></a><h3>Packages</h3>
     <p>Software lifecycle integrity is maintained via Alpine Package Keeper. By utilizing deterministic builds and local offline signatures, we ensure a highly defensive supply chain architecture.</p>
     <ul>
@@ -98,49 +107,6 @@
     </ul>
   </section>
 
-  <section>
-    <a name="rc"></a><h3>RC.Init</h3>
-    <p>Process initialization follows a strictly deterministic dependency graph. OpenRC eliminates parallel background bloat by mapping service dependencies cleanly and predictably during boot orchestration.</p>
-    <ul>
-      <li><b><a href="https://docs.alpinelinux.org/user-handbook/0.1a/Working/openrc.html">OpenRC Handbook</a></b> — Upstream Documentation</li>
-      <li><b><a href="https://github.com/bitedits/openrc">bitedits/openrc</a></b> — SEC-LINE Custom Fork</li>
-    </ul>
-  </section>
-
-  <section>
-    <a name="users"></a><h3>Users</h3>
-    <p>Privilege transitions are governed by OpenDoas. This minimalist framework enforces strict execution constraints with a footprint of less than 5% compared to legacy sudo, entirely preventing cross-shell context persistence.</p>
-    <ul>
-      <li><b><a href="https://github.com/bitedits/OpenDoas">bitedits/OpenDoas</a></b> — OpenBSD User Management for Linux</li>
-    </ul>
-  </section>
-
-  <section>
-    <a name="posix"></a><h3>POSIX</h3>
-    <p>All vital system utilities are provided by Toybox. This establishes a hard breakpoint that separates the core system from monolithic GNU dependencies while retaining absolute POSIX compliance.</p>
-    <ul>
-      <li><b><a href="http://landley.net/toybox/">Toybox</a></b> — Upstream Project</li>
-      <li><b><a href="https://github.com/bitedits/toybox">bitedits/toybox</a></b> — SEC-LINE Custom Fork</li>
-    </ul>
-  </section>
-
-  <section>
-    <a name="seat"></a><h3>Seat</h3>
-    <p>Input routing and hardware mediation are controlled by seatd. It securely permits graphical workspaces to access shared devices without elevating permissions to complex display manager suites.</p>
-    <ul>
-      <li><b><a href="https://man.sr.ht/~kennylevinsen/seatd/">seatd</a></b> — Upstream Documentation</li>
-      <li><b><a href="https://github.com/bitedits/seatd">bitedits/seatd</a></b> — SEC-LINE Custom Fork</li>
-    </ul>
-  </section>
-
-  <section>
-    <a name="wm"></a><h3>Window Manager</h3>
-    <p>The visual desktop layout is anchored by Claude's Tab Window Manager. By bypassing complex message brokers and notification loops, ctwm drastically reduces the rendering attack surface, providing a highly productive, ultra-light interface.</p>
-    <ul>
-      <li><b><a href="https://www.ctwm.org/index.html">ctwm</a></b> — Upstream Project</li>
-      <li><b><a href="https://github.com/bitedits/ctwm">bitedits/ctwm</a></b> — SEC-LINE Custom Fork</li>
-    </ul>
-  </section>
 
   <section>
     <a name="firewall"></a><h3>Firewall</h3>
@@ -161,11 +127,74 @@
   </section>
 
   <section>
-    <a name="time"></a><h3>Time</h3>
-    <p>Accurate, cryptographic synchronization is paramount to securing a zero-trust architecture. Chrony serves as an isolated NTP client ensuring that system timestamps remain rigorously validated against network tampering.</p>
+    <a name="rc"></a><h3>Init Supervisor</h3>
+    <p>Process initialization follows a strictly deterministic dependency graph. OpenRC eliminates parallel background bloat by mapping service dependencies cleanly and predictably during boot orchestration.</p>
     <ul>
-      <li><b><a href="https://chrony-project.org">Chrony</a></b> — Upstream Project</li>
-      <li><b><a href="https://github.com/mlichvar/chrony">mlichvar/chrony</a></b> — Source Code</li>
+      <li><b><a href="https://docs.alpinelinux.org/user-handbook/0.1a/Working/openrc.html">OpenRC Handbook</a></b> — Upstream Documentation</li>
+      <li><b><a href="https://github.com/bitedits/openrc">bitedits/openrc</a></b> — SEC-LINE Custom Fork</li>
+    </ul>
+  </section>
+
+  <section>
+    <a name="users"></a><h3>User Privileges</h3>
+    <p>Privilege transitions are governed by OpenDoas.
+       This minimalist framework enforces strict execution constraints with a footprint of less than 5% compared to legacy sudo,
+       entirely preventing cross-shell context persistence.</p>
+    <ul>
+      <li><b><a href="https://github.com/bitedits/OpenDoas">bitedits/OpenDoas</a></b> — OpenBSD User Management for Linux</li>
+    </ul>
+  </section>
+
+  <section>
+    <a name="seat"></a><h3>Seat Devices</h3>
+    <p>Input routing and hardware mediation are controlled by seatd.
+       It securely permits graphical workspaces to access shared devices without elevating permissions to complex display manager suites.</p>
+    <ul>
+      <li><b><a href="https://man.sr.ht/~kennylevinsen/seatd/">seatd</a></b> — Upstream Documentation</li>
+      <li><b><a href="https://github.com/bitedits/seatd">bitedits/seatd</a></b> — SEC-LINE Custom Fork</li>
+    </ul>
+  </section>
+
+
+  <section>
+    <a name="posix"></a><h3>POSIX Shell</h3>
+    <p>All vital system utilities are provided by Toybox. This establishes a hard breakpoint that separates the core system from monolithic GNU dependencies while retaining absolute POSIX compliance.</p>
+    <ul>
+      <li><b><a href="http://landley.net/toybox/">Toybox</a></b> — Upstream Project</li>
+      <li><b><a href="https://github.com/bitedits/toybox">bitedits/toybox</a></b> — SEC-LINE Custom Fork</li>
+    </ul>
+  </section>
+
+  <section>
+    <a name="wm"></a><h3>Window Manager</h3>
+    <p>The visual desktop layout is anchored by Claude's Tab Window Manager. By bypassing complex message brokers and notification loops, ctwm drastically reduces the rendering attack surface, providing a highly productive, ultra-light interface.</p>
+    <ul>
+      <li><b><a href="https://www.ctwm.org/index.html">ctwm</a></b> — Upstream Project</li>
+      <li><b><a href="https://github.com/bitedits/ctwm">bitedits/ctwm</a></b> — SEC-LINE Custom Fork</li>
+    </ul>
+  </section>
+
+  <section>
+    <a name="gstreamer"></a><h3>GStreamer</h3>
+    <p>Handling complex multimedia pipelines is delegated to GStreamer. Running within strictly isolated contexts, it ensures robust audio and video processing while preventing codec-level exploits from compromising the broader system.</p>
+    <ul>
+      <li><b><a href="https://gstreamer.freedesktop.org/">GStreamer</a></b> — Upstream Project</li>
+    </ul>
+  </section>
+
+  <section>
+    <a name="erlang"></a><h3>Erlang</h3>
+    <p>For resilient, fault-tolerant network services and daemons, SEC-LINE OS embraces Erlang. Its battle-tested actor model and extreme concurrency provide an uncompromising foundation for highly available distributed architectures.</p>
+    <ul>
+      <li><b><a href="https://www.erlang.org/">Erlang/OTP</a></b> — Upstream Project</li>
+    </ul>
+  </section>
+
+  <section>
+    <a name="elixir"></a><h3>Elixir</h3>
+    <p>Building atop the Erlang Virtual Machine, Elixir introduces modern developer tooling and extensibility. It accelerates the development of secure, scalable system services while inheriting the raw reliability of the underlying VM.</p>
+    <ul>
+      <li><b><a href="https://elixir-lang.org/">Elixir</a></b> — Upstream Project</li>
     </ul>
   </section>
 
@@ -181,6 +210,7 @@
 
   </section>
   <br>
+
 </article>
 </main>
 <footer>Made with <span class="heart">❤</span> for High-Assurance Computing</footer>

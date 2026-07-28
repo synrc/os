@@ -252,15 +252,17 @@ SEC-LINE OS maintains integrity through a strict binary deployment loop.
 
 \begin{table}[htbp]\centering\caption{System Parameter Architectural Baseline}
 \label{tab:comparative_matrix}
-\begin{tabular}{p{4.2cm} p{5.3cm} p{5.3cm}}
-\toprule\textbf{Security Parameter} & \textbf{Standard Enterprise Linux (GNU/systemd)} & \textbf{SEC-LINE OS (zencrypted/os)} \\
+\noindent\makebox[\textwidth][c]{
+\begin{tabular}{p{4.2cm} p{7cm} p{7cm}}
+\toprule\textbf{Security Parameter} & \textbf{Standard Enterprise Linux} & \textbf{SEC-LINE OS} \\
 \midrule\textbf{Boot Mechanism} & UEFI $\rightarrow$ GRUB $\rightarrow$ Kernel $\rightarrow$ Initramfs & UEFI $\rightarrow$ Signed Monolithic UKI \\
 \addlinespace\textbf{Boot Surface Tampering} & Vulnerable (Unsigned configs/modules) & Impossible (Breaks Secure Boot Signature) \\
 \addlinespace\textbf{Core Utilities} & GNU Coreutils ($\sim$150MB, Complex) & \texttt{bitedits/toybox} ($<$5MB, Minimalist) \\
 \addlinespace\textbf{Init Framework} & Complex asynchronous initialization & Monolithic, simple OpenRC system \\
 \addlinespace\textbf{Default Sandbox Engine} & Process-wide (SELinux/AppArmor) & Thread-level declarative Landlock \\
 \addlinespace\textbf{Privilege Transition} & Legacy Sudo Engine (Highly complex) & OpenDoas Framework (Audited, Minimal) \\
-\bottomrule\end{tabular}\end{table}
+\bottomrule\end{tabular}
+}\end{table}
 
 \section{Conclusion}
 

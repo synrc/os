@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="SEC-LINE OS Technical Whitepaper" />
+<meta name="author" content="SEC-LINE Engineering Group" />
+<title>SEC-LINE</title>
+<link rel="stylesheet" href="https://n2o.dev/blank.css?x=15" />
+<link rel="stylesheet" href="https://n2o.dev/nato.css?x=15" />
+<link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href=".img/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png" />
+<link rel="manifest" href="img/site.webmanifest" />
+</head>
+<body>
+<nav>
+  <a href="https://bitedits.com">DEV</a>
+  <a href="#" style="background:#ededed;">SEC-LINE</a>
+</nav>
+<header>
+  <a href="https://github.com/bitedits"><img src="https://n2o.dev/img/2B55.svg" /></a>
+  <h1>SEC-LINE</h1>
+</header>
+<aside>
+  <article>
+    <section>
+      <h3>SYNOPSIS</h3>
+      <div>SEC-LINE OS (internally designated as <b>zencrypted/os</b>) is a monolithic, zero-trust operating infrastructure designed for high-assurance computing.
+         It synthesizes an ultra-lightweight independent rootfs framework, an immutable Unified Kernel Image (UKI),
+         declarative hardware sandboxing, and strict privilege isolation, eliminating legacy attack vectors.
+      </div><br/>
+      <div>
+        2026 © <a href="https://github.com/bitedits">SEC-LINE</a><br />
+        Status: Architecture Specification
+      </div>
+    </section>
+  </article>
+</aside>
+<main>
+<article>
+  <section>
+    <a name="story"></a><h3>The Zero-Trust Architecture</h3>
+    <p>SEC-LINE OS is built as a fortress from the ground up. Our architecture is defined by four distinct, uncompromising layers that synthesize to form an unassailable high-assurance computing environment.</p>
+  </section>
+
+  <section>
+    <a name="layer1"></a><h3>1. Verified Hardware Layer</h3>
+    <p><b>Hardware Trust & Cryptography.</b> Security starts at the bare metal. By completely eliminating vulnerable secondary bootloaders like GRUB, we anchor the OS directly into hardware trust. The system boots via a single, cryptographically signed Unified Kernel Image (UKI) that is evaluated natively by UEFI Secure Boot. Once hardware trust is established, this immutable boot sequence seamlessly decrypts and initializes the storage layer using AES-XTS-PLAIN64 dm-crypt, ensuring no unverified code ever reaches execution.</p>
+  </section>
+
+  <section>
+    <a name="layer2"></a><h3>2. Immutable Runtime Kernel</h3>
+    <p><b>Hardened Linux & eBPF Observability.</b> Ascending from the hardware, the runtime is governed by a highly tailored downstream derivation of the Linux Hardened kernel. Instead of pursuing raw benchmarks, this layer prioritizes exploit mitigation through strict Page Table Isolation and Kernel Stack Randomization. For visibility, we utilize eBPF tracepoints and auditd, delivering high-fidelity, non-invasive system observability without introducing complex runtime hooking infrastructures.</p>
+  </section>
+
+  <section>
+    <a name="layer3"></a><h3>3. Core Userspace Engine</h3>
+    <p><b>Deterministic & Minimalist.</b> Above the kernel lies the engine of the operating system—a radically minimized userspace. Discarding the massive bloat of standard GNU utilities and systemd, SEC-LINE OS deploys <code>bitedits/toybox</code> for clean POSIX compliance and <code>openrc</code> for a deterministic, parallel-free service dependency graph. Administrative tasks are tightly controlled by OpenDoas, which boasts a footprint less than 5% of legacy sudo and strictly forbids context persistence between shell instances.</p>
+  </section>
+
+  <section>
+    <a name="layer4"></a><h3>4. Applications & Environment</h3>
+    <p><b>Sandboxing & The High-Assurance Desktop.</b> Finally, at the highest layer, applications run in an environment of complete zero-trust. Applications lack system-wide visibility and are isolated by default using unprivileged, declarative Landlock LSM rules. The network boundary is fiercely defended by a default-drop <code>nftables</code> core configuration. Graphical sessions are securely routed through <code>seatd</code> and rendered by Claude's Tab Window Manager (ctwm), bypassing modern desktop notification loops to provide a hyper-efficient, secure interaction domain.</p>
+  </section>
+</article>
+</main>
+<footer>Made with <span class="heart">❤</span> for High-Assurance Computing</footer>
+</body>
+</html>

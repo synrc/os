@@ -1,0 +1,18 @@
+
+zencrypted/os
+
+Rootfs: https://www.alpinelinux.org — https://github.com/bitedits/alpine
+Boot Process: UEFI + signed UKI + direct kernel loading + dm-crypt (initramfs)
+Power: acpi + cpupower
+Packages: https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper – https://github.com/alpinelinux/apk-tools
+Auditing: https://github.com/bitedits/audit-userpace
+Tracing: https://ebpf.io, https://bpftrace.org — https://github.com/bpftrace/bpftrace
+RC.Init: https://docs.alpinelinux.org/user-handbook/0.1a/Working/openrc.html  — https://github.com/bitedits/openrc
+Users: OpenBSD user management for Linux – https://github.com/Duncaen/OpenDoas
+POSIX: http://landley.net/toybox/ – https://github.com/bitedits/toybox
+Seat: https://man.sr.ht/~kennylevinsen/seatd/ — https://github.com/bitedits/seatd
+WM: https://www.ctwm.org/index.html — https://github.com/bitedits/ctwm
+Firewall: https://www.netfilter.org/projects/nftables/index.html — https://git.netfilter.org/nftables/tree/
+MAC: https://landlock.io – https://github.com/landlock-lsm/landlockconfig/
+Time: https://chrony-project.org — https://github.com/mlichvar/chrony
+

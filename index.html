@@ -65,7 +65,7 @@
   </section>
 
   <section>
-    <a name="power"></a><h3>ANSI C99</h3>
+    <a name="power"></a><h3>C Library</h3>
     <p>An implementation of the standard library functionality described in the ISO C and POSIX standards, plus common extensions,
        built on top of the Linux system calls API. MUSLC is used in NuttX, Alpine, Chimera, ans SEC-LINE.</p>
     <ul>
@@ -75,14 +75,18 @@
 
   <section>
     <a name="power"></a><h3>Berkley Userland</h3>
-    <p></p>
+    <p>All vital system utilities are provided by Alpine Toybox or Chimeratils BSD Userland.
+       This establishes a hard breakpoint that separates the core system from monolithic
+       dependencies while retaining absolute POSIX compliance.</p>
     <ul>
-      <li><b><a href="https://github.com/chimera-linux/chimerautils">Chimera Utils</a></b> — Upstream Project</li>
+      <li><b><a href="http://landley.net/toybox/">Toybox</a></b> — Upstream Project</li>
+      <li><b><a href="https://codeberg.org/bitedits/toybox">bitedits/toybox</a></b> — SEC-LINE Custom Fork</li>
+      <li><b><a href="https://github.com/bitedits/chimerautils">bitedits/chimerautils</a></b> — Chimera BSD Userland</li>
     </ul>
   </section>
 
   <section>
-    <a name="power"></a><h3>Power</h3>
+    <a name="power"></a><h3>Power Tools</h3>
     <p>Hardware power states and performance governors are managed directly through native logic, eschewing heavy system daemons in favor of predictable, direct tuning mechanisms.</p>
     <ul>
       <li><b>Tooling</b> — acpi + cpupower</li>
@@ -90,8 +94,10 @@
   </section>
 
   <section>
-    <a name="time"></a><h3>Time</h3>
-    <p>Accurate, cryptographic synchronization is paramount to securing a zero-trust architecture. Chrony serves as an isolated NTP client ensuring that system timestamps remain rigorously validated against network tampering.</p>
+    <a name="time"></a><h3>Time Server</h3>
+    <p>Accurate, cryptographic synchronization is paramount to securing a zero-trust architecture.
+    Chrony serves as an isolated NTP client ensuring that system timestamps remain rigorously validated against network tampering.
+    Chrony is used in Alpine, Chimera and SEC-LINE.</p>
     <ul>
       <li><b><a href="https://chrony-project.org">Chrony</a></b> — Upstream Project</li>
       <li><b><a href="https://github.com/mlichvar/chrony">mlichvar/chrony</a></b> — Source Code</li>
@@ -99,8 +105,10 @@
   </section>
 
   <section>
-    <a name="packages"></a><h3>Packages</h3>
-    <p>Software lifecycle integrity is maintained via Alpine Package Keeper. By utilizing deterministic builds and local offline signatures, we ensure a highly defensive supply chain architecture.</p>
+    <a name="packages"></a><h3>Package Management</h3>
+    <p>Software lifecycle integrity is maintained via Alpine Package Keeper.
+       By utilizing deterministic builds and local offline signatures, we ensure a highly defensive supply chain architecture.
+       APKv3 is used by Alpine, Chimera and SEC-LINE.</p>
     <ul>
       <li><b><a href="https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper">Alpine Package Keeper</a></b> — Documentation</li>
       <li><b><a href="https://github.com/alpinelinux/apk-tools">alpinelinux/apk-tools</a></b> — Source Code</li>
@@ -109,7 +117,8 @@
 
   <section>
     <a name="auditing"></a><h3>Auditing</h3>
-    <p>System call profiling and anomaly detection are captured dynamically by a localized, minimal auditing layer, entirely bypassing bloated centralized logging paradigms.</p>
+    <p>System call profiling and anomaly detection are captured dynamically by a localized,
+       minimal auditing layer, entirely bypassing bloated centralized logging paradigms.</p>
     <ul>
       <li><b><a href="https://github.com/bitedits/audit-userpace">bitedits/audit-userpace</a></b> — Userspace Auditing</li>
     </ul>
@@ -117,7 +126,8 @@
 
   <section>
     <a name="tracing"></a><h3>Tracing</h3>
-    <p>Advanced, non-invasive system observability is delivered natively through eBPF. Security policies monitor kernel tracepoints dynamically without requiring structural alterations or intrusive kernel hooks.</p>
+    <p>Advanced, non-invasive system observability is delivered natively through eBPF.
+       Security policies monitor kernel tracepoints dynamically without requiring structural alterations or intrusive kernel hooks.</p>
     <ul>
       <li><b><a href="https://ebpf.io">eBPF</a></b> & <b><a href="https://bpftrace.org">bpftrace.org</a></b> — Upstream Projects</li>
       <li><b><a href="https://github.com/bpftrace/bpftrace">bpftrace/bpftrace</a></b> — Source Code</li>
@@ -126,8 +136,9 @@
 
 
   <section>
-    <a name="firewall"></a><h3>Firewall</h3>
-    <p>The network boundary is fiercely guarded by a strict default-drop nftables stack. Routing policies are verified at load, ensuring only explicitly permitted, encrypted traffic traverses the network sockets.</p>
+    <a name="firewall"></a><h3>Network Firewall</h3>
+    <p>The network boundary is fiercely guarded by a strict default-drop nftables stack.
+       Routing policies are verified at load, ensuring only explicitly permitted, encrypted traffic traverses the network sockets.</p>
     <ul>
       <li><b><a href="https://www.netfilter.org/projects/nftables/index.html">nftables</a></b> — Upstream Project</li>
       <li><b><a href="https://git.netfilter.org/nftables/tree/">git.netfilter.org/nftables</a></b> — Source Code</li>
@@ -136,7 +147,8 @@
 
   <section>
     <a name="mac"></a><h3>Mandatory Access Control</h3>
-    <p>Moving beyond convoluted policy frameworks, SEC-LINE OS deploys thread-level unprivileged sandboxing via Landlock. Processes must securely restrict their own filesystem access through strict declarative profiles.</p>
+    <p>Moving beyond convoluted policy frameworks, SEC-LINE OS deploys thread-level unprivileged sandboxing via Landlock.
+       Processes must securely restrict their own filesystem access through strict declarative profiles.</p>
     <ul>
       <li><b><a href="https://landlock.io">Landlock</a></b> — Upstream Project</li>
       <li><b><a href="https://github.com/landlock-lsm/landlockconfig/">landlock-lsm/landlockconfig</a></b> — Configuration Engine</li>
@@ -145,7 +157,9 @@
 
   <section>
     <a name="rc"></a><h3>Init Supervisor</h3>
-    <p>Process initialization follows a strictly deterministic dependency graph. OpenRC eliminates parallel background bloat by mapping service dependencies cleanly and predictably during boot orchestration.</p>
+    <p>Process initialization follows a strictly deterministic dependency graph.
+    OpenRC eliminates parallel background bloat by mapping service dependencies cleanly and predictably during boot orchestration.
+    OpenRC is supported on Alpine, Chimera snd SEC-LINE.</p>
     <ul>
       <li><b><a href="https://docs.alpinelinux.org/user-handbook/0.1a/Working/openrc.html">OpenRC Handbook</a></b> — Upstream Documentation</li>
       <li><b><a href="https://github.com/bitedits/openrc">bitedits/openrc</a></b> — SEC-LINE Custom Fork</li>
@@ -156,7 +170,7 @@
     <a name="users"></a><h3>User Privileges</h3>
     <p>Privilege transitions are governed by OpenDoas.
        This minimalist framework enforces strict execution constraints with a footprint of less than 5% compared to legacy sudo,
-       entirely preventing cross-shell context persistence.</p>
+       entirely preventing cross-shell context persistence. Doas is used in Alpine, Chimera and SEC-LINE.</p>
     <ul>
       <li><b><a href="https://github.com/bitedits/OpenDoas">bitedits/OpenDoas</a></b> — OpenBSD User Management for Linux</li>
     </ul>
@@ -165,28 +179,19 @@
   <section>
     <a name="seat"></a><h3>Seat Devices</h3>
     <p>Input routing and hardware mediation are controlled by seatd.
-       It securely permits graphical workspaces to access shared devices without elevating permissions to complex display manager suites.</p>
+       It securely permits graphical workspaces to access shared devices without elevating permissions to complex display manager suites.
+       Seat Daemon is used in Alpine, Chimera and SEC-LINE.</p>
     <ul>
       <li><b><a href="https://man.sr.ht/~kennylevinsen/seatd/">seatd</a></b> — Upstream Documentation</li>
       <li><b><a href="https://github.com/bitedits/seatd">bitedits/seatd</a></b> — SEC-LINE Custom Fork</li>
     </ul>
   </section>
 
-
-  <section>
-    <a name="posix"></a><h3>Command Box</h3>
-    <p>All vital system utilities are provided by Toybox.
-       This establishes a hard breakpoint that separates the core system from monolithic
-       dependencies while retaining absolute POSIX compliance.</p>
-    <ul>
-      <li><b><a href="http://landley.net/toybox/">Toybox</a></b> — Upstream Project</li>
-      <li><b><a href="https://codeberg.org/landley/toybox">bitedits/toybox</a></b> — SEC-LINE Custom Fork</li>
-    </ul>
-  </section>
-
   <section>
     <a name="wm"></a><h3>Window Manager</h3>
-    <p>The visual desktop layout is anchored by Claude's Tab Window Manager. By bypassing complex message brokers and notification loops, ctwm drastically reduces the rendering attack surface, providing a highly productive, ultra-light interface.</p>
+    <p>The visual desktop layout is anchored by Claude's Tab Window Manager from NetBSD.
+       By bypassing complex message brokers and notification loops,
+     cwm drastically reduces the rendering attack surface, providing a highly productive, ultra-light interface.</p>
     <ul>
       <li><b><a href="https://www.ctwm.org/index.html">ctwm</a></b> — Upstream Project</li>
       <li><b><a href="https://github.com/bitedits/ctwm">bitedits/ctwm</a></b> — SEC-LINE Custom Fork</li>

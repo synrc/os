@@ -48,7 +48,15 @@
   </section>
 
   <section>
-    <a name="rootfs"></a><h3>Rootfs</h3>
+    <a name="boot"></a><h3>Secure Boot</h3>
+    <p>SEC-LINE OS eliminates legacy bootloaders (like GRUB) which are inherently vulnerable to tampering. Instead, the firmware directly executes an immutable Unified Kernel Image (UKI) via UEFI Secure Boot. This mechanism handles runtime decryption and initialization seamlessly.</p>
+    <ul>
+      <li><b>Mechanism</b> — UEFI, signed UKI, direct kernel loading, dm-crypt (initramfs)</li>
+    </ul>
+  </section>
+
+  <section>
+    <a name="rootfs"></a><h3>Root File-system</h3>
     <p>At the core of the user environment is an ultra-minimalist root filesystem derived from Alpine Linux. By managing a dedicated downstream fork, we strictly control and minimize the surface area of the base distribution.</p>
     <ul>
       <li><b><a href="https://www.alpinelinux.org">Alpine Linux</a></b> — Upstream Project</li>
@@ -57,10 +65,19 @@
   </section>
 
   <section>
-    <a name="boot"></a><h3>Boot Process</h3>
-    <p>SEC-LINE OS eliminates legacy bootloaders (like GRUB) which are inherently vulnerable to tampering. Instead, the firmware directly executes an immutable Unified Kernel Image (UKI) via UEFI Secure Boot. This mechanism handles runtime decryption and initialization seamlessly.</p>
+    <a name="power"></a><h3>ANSI C99</h3>
+    <p>An implementation of the standard library functionality described in the ISO C and POSIX standards, plus common extensions,
+       built on top of the Linux system calls API. MUSLC is used in NuttX, Alpine, Chimera, ans SEC-LINE.</p>
     <ul>
-      <li><b>Mechanism</b> — UEFI + signed UKI + direct kernel loading + dm-crypt (initramfs)</li>
+      <li><b><a href="https://musl.libc.org/about.html">MUSL C</a></b> — Upstream Project</li>
+    </ul>
+  </section>
+
+  <section>
+    <a name="power"></a><h3>Berkley Userland</h3>
+    <p></p>
+    <ul>
+      <li><b><a href="https://github.com/chimera-linux/chimerautils">Chimera Utils</a></b> — Upstream Project</li>
     </ul>
   </section>
 
@@ -157,11 +174,13 @@
 
 
   <section>
-    <a name="posix"></a><h3>POSIX Shell</h3>
-    <p>All vital system utilities are provided by Toybox. This establishes a hard breakpoint that separates the core system from monolithic GNU dependencies while retaining absolute POSIX compliance.</p>
+    <a name="posix"></a><h3>Command Box</h3>
+    <p>All vital system utilities are provided by Toybox.
+       This establishes a hard breakpoint that separates the core system from monolithic
+       dependencies while retaining absolute POSIX compliance.</p>
     <ul>
       <li><b><a href="http://landley.net/toybox/">Toybox</a></b> — Upstream Project</li>
-      <li><b><a href="https://github.com/bitedits/toybox">bitedits/toybox</a></b> — SEC-LINE Custom Fork</li>
+      <li><b><a href="https://codeberg.org/landley/toybox">bitedits/toybox</a></b> — SEC-LINE Custom Fork</li>
     </ul>
   </section>
 

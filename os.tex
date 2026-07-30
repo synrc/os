@@ -1,87 +1,169 @@
 \documentclass{article}
+
 \usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{eso-pic}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage[english, ukrainian]{babel}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{titlesec}
+
+\definecolor{nato}{HTML}{293757}
+\definecolor{footergray}{gray}{0.65}
+
+\geometry{a4paper,left=3cm,right=3cm,top=3cm,bottom=3cm}
+\renewcommand{\familydefault}{\sfdefault}
+\setcounter{secnumdepth}{3}
+
+\DeclareFontFamily{T2A}{phv}{}
+\DeclareFontShape{T2A}{phv}{m}{n}{<->ssub * cmss/m/n}{}
+\DeclareFontShape{T2A}{phv}{bx}{n}{<->ssub * cmss/bx/n}{}
+\DeclareFontShape{T2A}{phv}{m}{it}{<->ssub * cmss/m/it}{}
+\DeclareFontShape{T2A}{phv}{bx}{it}{<->ssub * cmss/bx/it}{}
+
+\titleformat{\section} {\color{nato}\Huge\bfseries}{\thesection.}{1em}{}
+\titlespacing*{\section}{0pt}{30pt}{12pt}
+\titleformat{\subsection} {\color{nato}\LARGE\bfseries}{\thesubsection.}{1em}{}
+\titlespacing*{\subsection}{0pt}{20pt}{8pt}
+\titleformat{\subsubsection} {\color{nato}\Large\bfseries}{\thesubsubsection.}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{10pt}{6pt}
+\titleformat{\paragraph} {\color{nato}\large\bfseries}{\theparagraph.}{1em}{}
+\titlespacing*{\paragraph}{0pt}{8pt}{4pt}
+
+
+\fancyhf{}
+\fancyhead[R]{\small\color{footergray} 27 червня 2026}
+\fancyfoot[L]{\small\color{footergray} ERP/1. Операційна система}
+\fancyfoot[R]{\small\color{footergray}\thepage}
+
+\newcommand\HUGE[1]{\fontsize{40}{40}\selectfont #1}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\footrule}{\color{footergray}\hrule width \textwidth height 0.4pt}
+
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{booktabs}
-\usepackage{fancyvrb}
-\usepackage{fvextra}
 \usepackage{hyperref}
-\usepackage{microtype}
 \usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, arrows.meta, positioning, fit, backgrounds}
 
-\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\let\originalfootnotesize\footnotesize
+\let\oldverbatim\verbatim
+\let\oldendverbatim\endverbatim
+\renewenvironment{verbatim}{\originalfootnotesize\oldverbatim}{\oldendverbatim}
+
+\title{\textbf{ZCOS}: \\
+       \Large A Monolithic, Zero-Trust Architecture \\
+       for Hardened Edge and Desktop Systems \\ }
+\author{BitEdits Engineering Group}
+\date{\today}
 
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
     filecolor=magenta,
     urlcolor=cyan,
-    pdftitle={SEC-LINE OS Technical Whitepaper},
+    pdftitle={ZCOS Technical Whitepaper},
     pdfpagemode=FullScreen,
 }
 
-\title{\textbf{SEC-LINE OS (zencrypted/os)}\\
-\large Technical Whitepaper: A Monolithic, Zero-Trust Architecture for Hardened Edge and Desktop Systems}
-\author{\textbf{SEC-LINE Engineering Group / bitedits}}
-\date{Status: Architecture Specification \ | \ Classification: Public \\ \today}
-
 \begin{document}
+
+\begin{titlepage}
+  \AddToShipoutPictureBG*{\AtPageLowerLeft{\color{nato}\rule{\paperwidth}{\paperheight}}}
+  \color{white}\thispagestyle{empty}\vspace*{3cm}\centering
+  {\Huge  \textbf{Zen Crypted Operating System} \par} \vspace{1.5cm}
+  {\HUGE  \textbf{Технічне завдання} \par} \vspace{1.5cm}
+  {\LARGE \textbf{на розробку та впровадження \\ операційної системи ZCOS \\ з ядром Linux та бібліотеками BSD} \par} \vspace{1.5cm}
+  {\large На основі Технічних Вимог \par}
+  {\large Згідно з Постановою КМУ № 205 від 21.02.2025 \par}
+  {\large Формалізованих за стандартом ISO/IEC/IEEE 29148:2018 \par} \vfill
+  {\large 2026 \copyright\ Криптографічні Телесистеми \par}
+\end{titlepage}
 
 \maketitle
 \tableofcontents
 \newpage
 
-\section{Executive Summary}
-Modern operating systems suffer from bloated attack surfaces, architectural coupling with system management daemons (\texttt{systemd}), and complex boot chains vulnerable to physical and logical tampering. \textbf{SEC-LINE OS} (internally designated as \textbf{zencrypted/os}) introduces a minimalist, zero-trust operating infrastructure designed for high-assurance computing.
+\section{Introduction}
+ZCOS (internally designated as \textbf{zencrypted/os}) is a monolithic, zero-trust operating infrastructure designed for high-assurance computing. Modern operating systems suffer from bloated attack surfaces, architectural coupling with system management daemons (\texttt{systemd}), and complex boot chains vulnerable to physical and logical tampering.
 
-By synthesizing an ultra-lightweight independent rootfs framework, an immutable Unified Kernel Image (UKI), declarative hardware sandboxing, and strict privilege isolation, SEC-LINE OS eliminates legacy attack vectors. The operating system boots directly from UEFI NVRAM into an encrypted memory-mapped environment, bypassing traditional bootloaders, and executing a sandboxed userspace governed by \texttt{musl-libc}, \texttt{toybox}, and the Landlock Linux Security Module (LSM).
+By synthesizing an ultra-lightweight independent rootfs framework, an immutable Unified Kernel Image (UKI), declarative hardware sandboxing, and strict privilege isolation, ZCOS eliminates legacy attack vectors. The operating system boots directly from UEFI NVRAM into an encrypted memory-mapped environment, bypassing traditional bootloaders, and executing a sandboxed userspace governed by \texttt{musl-libc}, \texttt{toybox}, and the Landlock Linux Security Module (LSM).
 
 \begin{center}
 \begin{tikzpicture}[
-    node distance=1.2cm,
-    layer/.style={rectangle, draw, fill=blue!5, text width=12cm, text centered, minimum height=0.8cm, rounded corners},
-    arrow/.style={thick, ->, >=stealth}
-]
-    \node (os) [layer, fill=blue!15] {\textbf{SEC-LINE OS System Architecture}};
-    \node (apps) [layer, below=of os] {[Applications / ctwm] $\rightarrow$ Landlock Policies / nftables / auditd};
-    \node (user) [layer, below=of apps] {[Core Userspace Engine] $\rightarrow$ OpenRC / bitedits-toybox / OpenDoas};
-    \node (kern) [layer, below=of user] {[Immutable Runtime Kernel] $\rightarrow$ Hardened Linux Kernel + eBPF Tracing};
-    \node (hw)   [layer, below=of kern] {[Verified Hardware Layer] $\rightarrow$ UEFI Secure Boot $\rightarrow$ dm-crypt Layer};
-
+    node distance=0.5cm,
+    layer/.style={rectangle, draw, fill=blue!5, text width=12cm, text centered, minimum height=0.3cm, rounded corners},
+    arrow/.style={thick, ->, >=stealth}]
+    \node (os) [layer, fill=blue!15] {\textbf{ZCOS System Architecture}};
+    \node (apps) [layer, below=of os] {Applications / ctwm $\rightarrow$ Landlock Policies / nftables / auditd};
+    \node (user) [layer, below=of apps] {Core Userspace Engine $\rightarrow$ OpenRC / bitedits-toybox / OpenDoas};
+    \node (kern) [layer, below=of user] {Immutable Runtime Kernel $\rightarrow$ Hardened Linux Kernel + eBPF Tracing};
+    \node (hw)   [layer, below=of kern] {Verified Hardware Layer $\rightarrow$ UEFI Secure Boot $\rightarrow$ dm-crypt Layer};
     \draw [arrow] (apps) -- (user);
     \draw [arrow] (user) -- (kern);
     \draw [arrow] (kern) -- (hw);
 \end{tikzpicture}
 \end{center}
 
-\section{Architectural Pillars}
-The design of SEC-LINE OS relies on four uncompromising principles:
+\subsubsection*{Architectural Pillars}
+The design of ZCOS relies on four uncompromising principles:
 \begin{itemize}
     \item \textbf{Cryptographic Immutability:} The entire base operating system kernel, configuration matrix, and initial execution files reside in a single, cryptographically signed binary.
-    \item \textbf{Attack Surface Minimization:} Traditional distributions deploy up to several gigabytes of software. SEC-LINE OS strips the base rootfs down to its absolute mathematical minimum via custom forks (\texttt{bitedits/*}).
+    \item \textbf{Attack Surface Minimization:} Traditional distributions deploy up to several gigabytes of software. ZCOS strips the base rootfs down to its absolute mathematical minimum via custom forks (\texttt{bitedits/*}).
     \item \textbf{Process Isolation by Default:} Applications lack system-wide visibility. Access to the filesystem, network socket layers, and hardware inputs must be explicitly granted via declarative kernel policies.
     \item \textbf{State Separation:} The operating system treats runtime state as volatile. Persistent changes are restricted to dedicated, encrypted data blocks.
 \end{itemize}
 
-\section{The Secure Boot \& Storage Cryptography Pipeline}
-SEC-LINE OS completely eliminates secondary bootloaders (e.g., GRUB, systemd-boot), which represent significant structural targets for Evil Maid attacks and persistent firmware exploitation.
+\subsubsection*{Kernel Architecture \& Security Profiles}
+The operating system runs an optimized downstream derivation of the Linux Hardened kernel, prioritizing compile-time exploit mitigation over raw benchmark optimizations.
+The kernel configuration enforces:
+\begin{itemize}
+    \item Strict Page Table Isolation (\texttt{PAGE\_\allowbreak TABLE\_\allowbreak ISOLATION=y}).
+    \item Kernel Stack Randomization on system calls (\texttt{RANDOMIZE\_\allowbreak KSTACK\_\allowbreak OFFSET=y}).
+    \item Complete memory wiping on allocation/deallocation boundary conditions (\texttt{INIT\_\allowbreak ON\_\allowbreak ALLOC\_\allowbreak DEFAULT\_\allowbreak ON=y}).
+\end{itemize}
+
+\section{Zen Crypted Operating System}
+
+\subsection{Secure Boot (\texttt{tpm2})}
+ZCOS eliminates legacy bootloaders (like GRUB) which are inherently vulnerable to tampering. Instead, the firmware directly executes an immutable Unified Kernel Image (UKI) via UEFI Secure Boot. This mechanism handles runtime decryption and initialization seamlessly.
+
+\begin{itemize}
+    \item \textbf{Mechanism} --- UEFI, signed UKI, direct kernel loading, dm-crypt (initramfs)
+\end{itemize}
+
+\subsection{Limine Bootloader (\texttt{limine})}
+Limine serves as the primary bootloader, ensuring a modern, strictly compliant UEFI boot sequence before transitioning to the Unified Kernel Image.
+
+\subsection{TianoCore EDK II (\texttt{edk2})}
+The firmware foundation relies on TianoCore EDK II, delivering a verifiable and trusted execution environment for UEFI Secure Boot operations.
 
 \begin{center}
 \begin{tikzpicture}[
     node distance=0.6cm,
     stepbox/.style={rectangle, draw, fill=gray!5, text width=4.2cm, text centered, minimum height=1.2cm, font=\small},
-    arrow/.style={thick, ->, >=stealth}
-]
+    arrow/.style={thick, ->, >=stealth}]
     \node (uefi) [stepbox] {\textbf{UEFI Secure Boot}\\(Hardware Trust)};
     \node (uki)  [stepbox, right=of uefi] {\textbf{Verify \& Execute}\\Monolithic Signed UKI};
     \node (crypt)[stepbox, right=of uki] {\textbf{Decrypt \& Init}\\Root via dm-crypt Layer};
-
     \draw [arrow] (uefi) -- (uki);
     \draw [arrow] (uki) -- (crypt);
 \end{tikzpicture}
 \end{center}
 
-\subsection{Unified Kernel Image (UKI) Construction}
+\subsubsection{Unified Kernel Image (UKI) Construction}
 The system builds a monolithic \texttt{zencrypted-os.efi} file containing:
 \begin{enumerate}
     \item An official UEFI boot stub (\texttt{systemd-stub} stripped of systemd execution logic).
@@ -90,10 +172,10 @@ The system builds a monolithic \texttt{zencrypted-os.efi} file containing:
     \item A minimal, specialized stage-1 \texttt{initramfs}.
 \end{enumerate}
 
-\subsection{Cryptographic Verification}
+\subsubsection{Cryptographic Verification}
 During machine activation, the hardware firmware evaluates the UKI against custom Platform Keys (\texttt{PK}/\texttt{KEK}/\texttt{db}) enrolled in the motherboard NVRAM. If verification succeeds, control hands off directly to the kernel execution thread.
 
-\subsection{Early-Stage Disk Decryption (\texttt{dm-crypt})}
+\subsubsection{Early-Stage Disk Decryption (\texttt{dm-crypt})}
 The immutable \texttt{initramfs} instantiates a minimal storage driver stack to invoke Linux kernel cryptography routines.
 \begin{itemize}
     \item The primary system partition is validated and decrypted using \texttt{cryptsetup} with \texttt{dm-crypt} (AES-XTS-PLAIN64).
@@ -101,46 +183,14 @@ The immutable \texttt{initramfs} instantiates a minimal storage driver stack to 
     \item Once authentication passes, the root filesystem mounts as a read-only device, executing a \texttt{switch\_root} loop into the main operating workspace.
 \end{itemize}
 
-\section{Kernel Architecture \& Security Profiles}
-The operating system runs an optimized downstream derivation of the Linux Hardened kernel, prioritizing compile-time exploit mitigation over raw benchmark optimizations.
+\subsection{Root File-system}
+At the core of the user environment is an ultra-minimalist root filesystem derived from Alpine Linux. By managing a dedicated downstream fork, we strictly control and minimize the surface area of the base distribution.
 
-\subsection{Core Hardening Flags}
-The kernel configuration enforces:
-\begin{itemize}
-    \item Strict Page Table Isolation (\texttt{PAGE\_\allowbreak TABLE\_\allowbreak ISOLATION=y}).
-    \item Kernel Stack Randomization on system calls (\texttt{RANDOMIZE\_\allowbreak KSTACK\_\allowbreak OFFSET=y}).
-    \item Complete memory wiping on allocation/deallocation boundary conditions (\texttt{INIT\_\allowbreak ON\_\allowbreak ALLOC\_\allowbreak DEFAULT\_\allowbreak ON=y}).
-\end{itemize}
+\subsection{C Library (\texttt{musl})}
+An implementation of the standard library functionality described in the ISO C and POSIX standards, plus common extensions, built on top of the Linux system calls API. MUSLC is used in NuttX, Alpine, Chimera, and ZCOS.
 
-\subsection{Mandatory Access Control via Landlock LSM}
-Unlike legacy MAC systems (SELinux/AppArmor) which add complex policy layers and complex tooling, SEC-LINE OS implements process sandboxing via \textbf{Landlock}.
-\begin{itemize}
-    \item \textbf{Mechanism:} Utilizing unprivileged sandboxing features, processes restrict their own filesystem actions and access paths.
-    \item \textbf{Configuration:} The userspace engine utilizes \texttt{landlockconfig} to ingest declarative TOML rule structures at application initialization.
-\end{itemize}
-
-\begin{Verbatim}[frame=single, label=Example System Profile: /etc/landlock/ctwm.toml, breaklines=true, fontsize=\small]
-[sandbox]
-handled_access_fs = ["execute", "read_file", "read_dir", "write_file"]
-
-[[rules.fs]]
-path = "/usr/bin/ctwm"
-access = ["execute", "read_file"]
-
-[[rules.fs]]
-path = "/home/zencrypted/.ctwmrc"
-access = ["read_file"]
-\end{Verbatim}
-
-\subsection{High-Fidelity Tracing \& Auditing (eBPF \& auditd)}
-System behavior analysis relies on non-invasive inspection loops rather than intrusive hooking infrastructures.
-\begin{itemize}
-    \item \textbf{Auditing:} System call profiling is verified by \texttt{bitedits/audit-userspace}, capturing unauthorized privilege transition vectors and immediate file write signals.
-    \item \textbf{eBPF Observability:} Leveraging \texttt{bpftrace} patched directly for \texttt{musl-libc} interfaces, security daemons monitor kernel tracepoints dynamically without requiring run-time structural alterations.
-\end{itemize}
-
-\section{Userspace Composition \& Fork Strategy}
-SEC-LINE OS avoids standard GNU utils and \texttt{busybox} monoliths, selecting modular components customized and maintained under the \texttt{bitedits} repository tree.
+\subsection{Berkley Userland (\texttt{chimerautils})}
+All vital system utilities are provided by Alpine Toybox or Chimeratils BSD Userland. This establishes a hard breakpoint that separates the core system from monolithic dependencies while retaining absolute POSIX compliance.
 
 \begin{center}
 \begin{tikzpicture}[
@@ -148,7 +198,7 @@ SEC-LINE OS avoids standard GNU utils and \texttt{busybox} monoliths, selecting 
     box/.style={rectangle, draw, fill=gray!5, text width=3.8cm, text centered, minimum height=1.5cm, font=\small},
     root/.style={rectangle, draw, fill=blue!10, text width=6cm, text centered, minimum height=0.8cm, font=\bfseries}
 ]
-    \node (top) [root] {SEC-LINE OS Userspace};
+    \node (top) [root] {ZCOS Userspace};
     \node (mid) [box, below=of top, yshift=-0.3cm] {\textbf{bitedits/alpine}\\Package Database Layout};
     \node (left) [box, left=of mid] {\textbf{bitedits/toybox}\\POSIX Core Commands};
     \node (right) [box, right=of mid] {\textbf{bitedits/openrc}\\Deterministic Init};
@@ -159,7 +209,7 @@ SEC-LINE OS avoids standard GNU utils and \texttt{busybox} monoliths, selecting 
 \end{tikzpicture}
 \end{center}
 
-\subsection{POSIX Engine: \texttt{bitedits/toybox}}
+\subsection{POSIX Engine (\texttt{toybox})}
 All vital system tools (\texttt{ls}, \texttt{ps}, \texttt{cat}, \texttt{chmod}) are provided via Rob Landley’s \texttt{toybox}. This deployment yields:
 \begin{itemize}
     \item A clean breakpoint separating the system from bloated GNU software dependencies.
@@ -167,67 +217,14 @@ All vital system tools (\texttt{ls}, \texttt{ps}, \texttt{cat}, \texttt{chmod}) 
     \item Symmetrical performance enhancements when interacting with memory operations over the \texttt{musl} API.
 \end{itemize}
 
-\subsection{Service Supervision: \texttt{bitedits/openrc}}
-Process initialization follows a deterministic dependency graph managed by \texttt{openrc}.
-\begin{itemize}
-    \item \textbf{No Parallel Background Bloat:} Service dependencies map cleanly during build orchestration.
-    \item \textbf{Predictable Execution Blocks:} Services run as unprivileged isolations where feasible, logging securely to stateless \texttt{/dev/log} pipes audited by \texttt{auditd}.
-\end{itemize}
+\subsection{Power Tools (\texttt{acpi})}
+Hardware power states and performance governors are managed directly through native logic, eschewing heavy system daemons in favor of predictable, direct tuning mechanisms. Tooling relies on \texttt{acpi} and \texttt{cpupower}.
 
-\subsection{Privilege Escalation: OpenDoas}
-For administrative access loops, standard \texttt{sudo} is banned.
-The system relies on \texttt{bitedits/OpenDoas}, enforcing:
+\subsection{Time Server (\texttt{chrony})}
+Accurate, cryptographic synchronization is paramount to securing a zero-trust architecture. Chrony serves as an isolated NTP client ensuring that system timestamps remain rigorously validated against network tampering. Chrony is used in Alpine, Chimera and ZCOS.
 
-\begin{itemize}
-\item A code footprint less than 5\% of legavcy \texttt{sudo}.
-\item Zero context persistence between separate shell instances.
-\item Strict execution constraints mapped explicitly per user profile.
-\end{itemize}
-
-\section{Networking, Peripheral \& Graphical Environments}
-
-The user interaction domain operates with the same minimal privileges as the core data routing architecture.
-
-\subsection{Network Security Layer (\texttt{nftables})}
-
-The firewall stack loads directly within the kernel image definition, adopting a strict \textbf{Default-Drop}
-posture across all interface hooks:
-
-\begin{Verbatim}[frame=single, label=nftables Core Configurations, breaklines=true, fontsize=\small]
-table inet filter {chain input {type filter hook input priority filter;
-policy drop;ct state established,related acceptiif "lo" accept}chain forward {type filter hook forward
-priority filter; policy drop;}chain output {type filter hook output priority filter; policy drop;
-udp dport 123 accept # Allowed: chrony NTP Synctcp dport 443 accept # Allowed: Outbound Encrypted TLS}}
-\end{Verbatim}
-
-\subsection{Seat and Input Management (\texttt{seatd})}
-
-To operate a graphical workspace without a resource-heavy or complex display manager,
-SEC-LINE OS links input routing through \texttt{seatd}.
-
-\begin{itemize}
-\item Grants application engines access to shared hardware
-      interfaces (such as graphics cards or inputs) without
-      requiring elevated \texttt{root} permissions.
-\item Avoids any dependency on large user tracking packages,
-      maintaining a tiny security perimeter for input tracking.
-\end{itemize}
-
-\subsection{Graphical Topography (\texttt{ctwm})}
-
-The desktop layout is anchored by \texttt{ctwm} (Claude's Tab Window Manager).
-
-\begin{itemize}
-\item \textbf{Efficiency:} It runs inside an extremely lightweight system profile,
-   bypassing modern desktop notification loops and complex message broker backplanes.
-\item \textbf{Security:} Minimizes the visual display and rendering attack surface
-   against local interface sniffing vectors.
-\end{itemize}
-
-\section{Package Lifecycle \& Supply Chain Integrity}
-
-Software supply chains represent a primary target for sophisticated adversaries.
-SEC-LINE OS maintains integrity through a strict binary deployment loop.
+\subsection{Package Management (\texttt{apk})}
+Software lifecycle integrity is maintained via Alpine Package Keeper (APKv3). By utilizing deterministic builds and local offline signatures, we ensure a highly defensive supply chain architecture.
 
 \begin{center}
 \begin{tikzpicture}[node distance=0.4cm,node/.style={rectangle, draw, fill=gray!5, text width=2.6cm,
@@ -247,14 +244,106 @@ SEC-LINE OS maintains integrity through a strict binary deployment loop.
       payloads directly into the OS structure, refusing any package lacking verified, local cryptographic signatures.
 \end{enumerate}
 
+\subsection{Auditing (\texttt{audit-userspace})}
+System call profiling and anomaly detection are captured dynamically by a localized, minimal auditing layer, entirely bypassing bloated centralized logging paradigms.
+
+System behavior analysis relies on non-invasive inspection loops rather than intrusive hooking infrastructures. System call profiling is verified by \texttt{bitedits/audit-userspace}, capturing unauthorized privilege transition vectors and immediate file write signals.
+
+\subsection{Tracing (\texttt{bpftrace})}
+Advanced, non-invasive system observability is delivered natively through eBPF. Security policies monitor kernel tracepoints dynamically without requiring structural alterations or intrusive kernel hooks.
+
+Leveraging \texttt{bpftrace} patched directly for \texttt{musl-libc} interfaces, security daemons monitor kernel tracepoints dynamically without requiring run-time structural alterations.
+
+\subsection{Network Firewall (\texttt{nftables})}
+The network boundary is fiercely guarded by a strict default-drop nftables stack. Routing policies are verified at load, ensuring only explicitly permitted, encrypted traffic traverses the network sockets.
+
+The firewall stack loads directly within the kernel image definition, adopting a strict \textbf{Default-Drop} posture across all interface hooks:
+
+\begin{verbatim}
+[frame=single, label=nftables Core Configurations, breaklines=true, fontsize=\small]
+table inet filter {chain input {type filter hook input priority filter;
+policy drop;ct state established,related acceptiif "lo" accept}chain forward {type filter hook forward
+priority filter; policy drop;}chain output {type filter hook output priority filter; policy drop;
+udp dport 123 accept # Allowed: chrony NTP Synctcp dport 443 accept # Allowed: Outbound Encrypted TLS}}
+\end{verbatim}
+
 \newpage
-\section{Comparative Matrix}
+\subsection{Mandatory Access Control (\texttt{landlock})}
+Moving beyond convoluted policy frameworks, ZCOS deploys thread-level unprivileged sandboxing via Landlock. Processes must securely restrict their own filesystem access through strict declarative profiles.
+
+Unlike legacy MAC systems (SELinux/AppArmor) which add complex policy layers and complex tooling, ZCOS implements process sandboxing natively:
+\begin{itemize}
+    \item \textbf{Mechanism:} Utilizing unprivileged sandboxing features, processes restrict their own filesystem actions and access paths.
+    \item \textbf{Configuration:} The userspace engine utilizes \texttt{landlockconfig} to ingest declarative TOML rule structures at application initialization.
+\end{itemize}
+
+\begin{verbatim}
+[frame=single, label=Example System Profile: /etc/landlock/ctwm.toml, breaklines=true, fontsize=\small]
+[sandbox]
+handled_access_fs = ["execute", "read_file", "read_dir", "write_file"]
+
+[[rules.fs]]
+path = "/usr/bin/ctwm"
+access = ["execute", "read_file"]
+
+[[rules.fs]]
+path = "/home/zencrypted/.ctwmrc"
+access = ["read_file"]
+\end{verbatim}
+
+\subsection{Init Supervisor (\texttt{openrc})}
+Process initialization follows a strictly deterministic dependency graph. OpenRC eliminates parallel background bloat by mapping service dependencies cleanly and predictably during boot orchestration.
+
+\begin{itemize}
+    \item \textbf{No Parallel Background Bloat:} Service dependencies map cleanly during build orchestration.
+    \item \textbf{Predictable Execution Blocks:} Services run as unprivileged isolations where feasible, logging securely to stateless \texttt{/dev/log} pipes audited by \texttt{auditd}.
+\end{itemize}
+
+\subsection{User Privileges (\texttt{doas})}
+Privilege transitions are governed by OpenDoas. This minimalist framework enforces strict execution constraints with a footprint of less than 5\% compared to legacy sudo, entirely preventing cross-shell context persistence.
+
+For administrative access loops, standard \texttt{sudo} is banned. The system relies on \texttt{bitedits/OpenDoas}, enforcing:
+\begin{itemize}
+\item A code footprint less than 5\% of legacy \texttt{sudo}.
+\item Zero context persistence between separate shell instances.
+\item Strict execution constraints mapped explicitly per user profile.
+\end{itemize}
+
+\newpage
+\subsection{Seat Devices (\texttt{seatd})}
+Input routing and hardware mediation are controlled by \texttt{seatd}. It securely permits graphical workspaces to access shared devices without elevating permissions to complex display manager suites.
+
+To operate a graphical workspace without a resource-heavy or complex display manager, ZCOS links input routing through \texttt{seatd}.
+\begin{itemize}
+\item Grants application engines access to shared hardware interfaces (such as graphics cards or inputs) without requiring elevated \texttt{root} permissions.
+\item Avoids any dependency on large user tracking packages, maintaining a tiny security perimeter for input tracking.
+\end{itemize}
+
+\subsection{Window Manager (\texttt{ctwm})}
+The visual desktop layout is anchored by Claude's Tab Window Manager (\texttt{ctwm}). By bypassing complex message brokers and notification loops, ctwm drastically reduces the rendering attack surface, providing a highly productive, ultra-light interface.
+
+\begin{itemize}
+\item \textbf{Efficiency:} It runs inside an extremely lightweight system profile, bypassing modern desktop notification loops and complex message broker backplanes.
+\item \textbf{Security:} Minimizes the visual display and rendering attack surface against local interface sniffing vectors.
+\end{itemize}
+
+\subsection{GStreamer (\texttt{gstreamer})}
+Handling complex multimedia pipelines is delegated to GStreamer. Running within strictly isolated contexts, it ensures robust audio and video processing while preventing codec-level exploits from compromising the broader system. GStreamer and PipeWire are supported in Chimera and ZCOS.
+
+\subsection{Erlang (\texttt{erlang})}
+For resilient, fault-tolerant network services and daemons, ZCOS embraces Erlang. Its battle-tested actor model and extreme concurrency provide an uncompromising foundation for highly available distributed architectures.
+
+\subsection{Elixir (\texttt{elixir})}
+Building atop the Erlang Virtual Machine, Elixir introduces modern developer tooling and extensibility. It accelerates the development of secure, scalable system services while inheriting the raw reliability of the underlying VM.
+
+\newpage
+\subsection{Comparative Matrix}
 
 \begin{table}[htbp]\centering\caption{System Parameter Architectural Baseline}
 \label{tab:comparative_matrix}
 \noindent\makebox[\textwidth][c]{
 \begin{tabular}{p{4.2cm} p{7cm} p{7cm}}
-\toprule\textbf{Security Parameter} & \textbf{Standard Enterprise Linux} & \textbf{SEC-LINE OS} \\
+\toprule\textbf{Security Parameter} & \textbf{Standard Enterprise Linux} & \textbf{ZCOS} \\
 \midrule\textbf{Boot Mechanism} & UEFI $\rightarrow$ GRUB $\rightarrow$ Kernel $\rightarrow$ Initramfs & UEFI $\rightarrow$ Signed Monolithic UKI \\
 \addlinespace\textbf{Boot Surface Tampering} & Vulnerable (Unsigned configs/modules) & Impossible (Breaks Secure Boot Signature) \\
 \addlinespace\textbf{Core Utilities} & GNU Coreutils ($\sim$150MB, Complex) & \texttt{bitedits/toybox} ($<$5MB, Minimalist) \\
@@ -265,10 +354,9 @@ SEC-LINE OS maintains integrity through a strict binary deployment loop.
 }\end{table}
 
 \section{Conclusion}
-
-SEC-LINE OS proves that modern hardware systems can be decoupled from complex, legacy distribution frameworks.
+ZCOS proves that modern hardware systems can be decoupled from complex, legacy distribution frameworks.
 By consolidating the runtime layer inside an immutable Unified Kernel Image and enforcing strict sandboxing
-across minimal userspace forks, SEC-LINE OS delivers an uncompromised, zero-trust infrastructure optimized
+across minimal userspace forks, ZCOS delivers an uncompromised, zero-trust infrastructure optimized
 for high-assurance desktop layouts and isolated edge computation nodes.
 
 \end{document}

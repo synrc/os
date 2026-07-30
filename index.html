@@ -4,9 +4,9 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="OS/1 Technical Whitepaper" />
-<meta name="author" content="OS/1 Engineering Group" />
-<title>OS/1</title>
+<meta name="description" content="OS.1 Technical Whitepaper" />
+<meta name="author" content="OS.1 Engineering Group" />
+<title>OS.1</title>
 <link rel="stylesheet" href="https://n2o.dev/blank.css" />
 <link rel="stylesheet" href="https://n2o.dev/nato.css" />
 <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
@@ -18,22 +18,22 @@
 <body>
 <nav>
   <a href="https://github.com/bitedits/">BITEDITS</a>
-  <a href="#" style="background:#ededed;">OS/1</a>
+  <a href="#" style="background:#ededed;">OS.1</a>
 </nav>
 <header>
   <a href="https://github.com/bitedits"><img src="https://openmoji.org/data/color/svg/1F510.svg" /></a>
-  <h1>OS/1</h1>
+  <h1>OS.1</h1>
 </header>
 <aside>
   <article>
     <section>
       <h3>SYNOPSIS</h3>
-      <div>OS/1 (internally designated as <b>zencrypted/os</b>) is a monolithic, zero-trust operating infrastructure designed for high-assurance computing.
+      <div>OS.1 (internally designated as <b>zencrypted/os</b>) is a monolithic, zero-trust operating infrastructure designed for high-assurance computing.
          It synthesizes an ultra-lightweight independent rootfs framework, an immutable Unified Kernel Image (UKI),
          declarative hardware sandboxing, and strict privilege isolation, eliminating legacy attack vectors.
       </div><br/>
       <div>
-        2026 © <a href="https://github.com/bitedits">OS/1</a><br />
+        2026 © <a href="https://github.com/bitedits">OS.1</a><br />
         Status: Architecture Specification
       </div>
     </section>
@@ -44,12 +44,12 @@
   
   <section>
     <a name="story"></a><h3>The Architecture</h3>
-    <p>OS/1 is built as a fortress from the ground up. Our environment is defined by carefully selected modules that synthesize to form an unassailable high-assurance computing layout. Here are the core components governing our zero-trust system:</p>
+    <p>OS.1 is built as a fortress from the ground up. Our environment is defined by carefully selected modules that synthesize to form an unassailable high-assurance computing layout. Here are the core components governing our zero-trust system:</p>
   </section>
 
   <section>
     <a name="boot"></a><h3>Secure Boot</h3>
-    <p>OS/1 eliminates legacy bootloaders (like GRUB) which are inherently vulnerable to tampering. Instead, the firmware directly executes an immutable Unified Kernel Image (UKI) via UEFI Secure Boot. This mechanism handles runtime decryption and initialization seamlessly.</p>
+    <p>OS.1 eliminates legacy bootloaders (like GRUB) which are inherently vulnerable to tampering. Instead, the firmware directly executes an immutable Unified Kernel Image (UKI) via UEFI Secure Boot. This mechanism handles runtime decryption and initialization seamlessly.</p>
     <ul>
       <li><b>Mechanism</b> — UEFI, signed UKI, direct kernel loading, dm-crypt (initramfs)</li>
       <li><b><a href="https://github.com/bitedits/limine">bitedits/limine</a></b> — Limine Bootloader</li>
@@ -62,14 +62,14 @@
     <p>At the core of the user environment is an ultra-minimalist root filesystem derived from Alpine Linux. By managing a dedicated downstream fork, we strictly control and minimize the surface area of the base distribution.</p>
     <ul>
       <li><b><a href="https://www.alpinelinux.org">Alpine Linux</a></b> — Upstream Project</li>
-      <li><b><a href="https://github.com/bitedits/alpine">bitedits/alpine</a></b> — OS/1 Custom Fork</li>
+      <li><b><a href="https://github.com/bitedits/alpine">bitedits/alpine</a></b> — OS.1 Custom Fork</li>
     </ul>
   </section>
 
   <section>
     <a name="power"></a><h3>C Library</h3>
     <p>An implementation of the standard library functionality described in the ISO C and POSIX standards, plus common extensions,
-       built on top of the Linux system calls API. MUSLC is used in NuttX, Alpine, Chimera, ans OS/1.</p>
+       built on top of the Linux system calls API. MUSLC is used in NuttX, Alpine, Chimera, ans OS.1.</p>
     <ul>
       <li><b><a href="https://musl.libc.org/about.html">MUSL C</a></b> — Upstream Project</li>
     </ul>
@@ -82,7 +82,7 @@
        dependencies while retaining absolute POSIX compliance.</p>
     <ul>
       <li><b><a href="http://landley.net/toybox/">Toybox</a></b> — Upstream Project</li>
-      <li><b><a href="https://codeberg.org/bitedits/toybox">bitedits/toybox</a></b> — OS/1 Custom Fork</li>
+      <li><b><a href="https://codeberg.org/bitedits/toybox">bitedits/toybox</a></b> — OS.1 Custom Fork</li>
       <li><b><a href="https://github.com/bitedits/chimerautils">bitedits/chimerautils</a></b> — Chimera BSD Userland</li>
     </ul>
   </section>
@@ -99,7 +99,7 @@
     <a name="time"></a><h3>Time Server</h3>
     <p>Accurate, cryptographic synchronization is paramount to securing a zero-trust architecture.
     Chrony serves as an isolated NTP client ensuring that system timestamps remain rigorously validated against network tampering.
-    Chrony is used in Alpine, Chimera and OS/1.</p>
+    Chrony is used in Alpine, Chimera and OS.1.</p>
     <ul>
       <li><b><a href="https://chrony-project.org">Chrony</a></b> — Upstream Project</li>
       <li><b><a href="https://github.com/mlichvar/chrony">mlichvar/chrony</a></b> — Source Code</li>
@@ -110,7 +110,7 @@
     <a name="packages"></a><h3>Package Management</h3>
     <p>Software lifecycle integrity is maintained via Alpine Package Keeper.
        By utilizing deterministic builds and local offline signatures, we ensure a highly defensive supply chain architecture.
-       APKv3 is used by Alpine, Chimera and OS/1.</p>
+       APKv3 is used by Alpine, Chimera and OS.1.</p>
     <ul>
       <li><b><a href="https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper">Alpine Package Keeper</a></b> — Documentation</li>
       <li><b><a href="https://github.com/alpinelinux/apk-tools">alpinelinux/apk-tools</a></b> — Source Code</li>
@@ -149,7 +149,7 @@
 
   <section>
     <a name="mac"></a><h3>Mandatory Access Control</h3>
-    <p>Moving beyond convoluted policy frameworks, OS/1 deploys thread-level unprivileged sandboxing via Landlock.
+    <p>Moving beyond convoluted policy frameworks, OS.1 deploys thread-level unprivileged sandboxing via Landlock.
        Processes must securely restrict their own filesystem access through strict declarative profiles.</p>
     <ul>
       <li><b><a href="https://landlock.io">Landlock</a></b> — Upstream Project</li>
@@ -161,10 +161,10 @@
     <a name="rc"></a><h3>Init Supervisor</h3>
     <p>Process initialization follows a strictly deterministic dependency graph.
     OpenRC eliminates parallel background bloat by mapping service dependencies cleanly and predictably during boot orchestration.
-    OpenRC is supported on Alpine, Chimera snd OS/1.</p>
+    OpenRC is supported on Alpine, Chimera snd OS.1.</p>
     <ul>
       <li><b><a href="https://docs.alpinelinux.org/user-handbook/0.1a/Working/openrc.html">OpenRC Handbook</a></b> — Upstream Documentation</li>
-      <li><b><a href="https://github.com/bitedits/openrc">bitedits/openrc</a></b> — OS/1 Custom Fork</li>
+      <li><b><a href="https://github.com/bitedits/openrc">bitedits/openrc</a></b> — OS.1 Custom Fork</li>
     </ul>
   </section>
 
@@ -172,7 +172,7 @@
     <a name="users"></a><h3>User Privileges</h3>
     <p>Privilege transitions are governed by OpenDoas.
        This minimalist framework enforces strict execution constraints with a footprint of less than 5% compared to legacy sudo,
-       entirely preventing cross-shell context persistence. Doas is used in Alpine, Chimera and OS/1.</p>
+       entirely preventing cross-shell context persistence. Doas is used in Alpine, Chimera and OS.1.</p>
     <ul>
       <li><b><a href="https://github.com/bitedits/OpenDoas">bitedits/OpenDoas</a></b> — OpenBSD User Management for Linux</li>
     </ul>
@@ -182,10 +182,10 @@
     <a name="seat"></a><h3>Seat Devices</h3>
     <p>Input routing and hardware mediation are controlled by seatd.
        It securely permits graphical workspaces to access shared devices without elevating permissions to complex display manager suites.
-       Seat Daemon is used in Alpine, Chimera and OS/1.</p>
+       Seat Daemon is used in Alpine, Chimera and OS.1.</p>
     <ul>
       <li><b><a href="https://man.sr.ht/~kennylevinsen/seatd/">seatd</a></b> — Upstream Documentation</li>
-      <li><b><a href="https://github.com/bitedits/seatd">bitedits/seatd</a></b> — OS/1 Custom Fork</li>
+      <li><b><a href="https://github.com/bitedits/seatd">bitedits/seatd</a></b> — OS.1 Custom Fork</li>
     </ul>
   </section>
 
@@ -196,7 +196,7 @@
      cwm drastically reduces the rendering attack surface, providing a highly productive, ultra-light interface.</p>
     <ul>
       <li><b><a href="https://www.ctwm.org/index.html">ctwm</a></b> — Upstream Project</li>
-      <li><b><a href="https://github.com/bitedits/ctwm">bitedits/ctwm</a></b> — OS/1 Custom Fork</li>
+      <li><b><a href="https://github.com/bitedits/ctwm">bitedits/ctwm</a></b> — OS.1 Custom Fork</li>
     </ul>
   </section>
 
@@ -205,7 +205,7 @@
     <p>Handling complex multimedia pipelines is delegated to GStreamer.
        Running within strictly isolated contexts, it ensures robust audio
        and video processing while preventing codec-level exploits from compromising the broader system.
-       GStreamer/PipeWire is supported in Chimera and OS/1.</p>
+       GStreamer/PipeWire is supported in Chimera and OS.1.</p>
     <ul>
       <li><b><a href="https://gstreamer.freedesktop.org/">GStreamer</a></b> — Upstream Project</li>
       <li><b><a href="https://pipewire.org/">PipeWire</a></b> — Upstream Project</li>
@@ -214,7 +214,7 @@
 
   <section>
     <a name="erlang"></a><h3>Erlang</h3>
-    <p>For resilient, fault-tolerant network services and daemons, OS/1 embraces Erlang.
+    <p>For resilient, fault-tolerant network services and daemons, OS.1 embraces Erlang.
        Its battle-tested actor model and extreme concurrency provide an uncompromising foundation
        for highly available distributed architectures.</p>
     <ul>
@@ -239,7 +239,7 @@
        onmouseover="this.style.transform='translateY(-2px)';this.style.color='white';"
        onmouseout="this.style.transform='translateY(0)';this.style.color='var(--text-secondary)';">
       <img src="https://anders.groupoid.space/images/pdf.jpg" style="margin-right:10px;" width="20" height="20" alt="PDF">
-      Namdak Tonpa. OS/1 A Monolithic, Zero-Trust Architecture for Hardened Edge and Desktop Systems. 2026</a></p>
+      Namdak Tonpa. OS.1 A Monolithic, Zero-Trust Architecture for Hardened Edge and Desktop Systems. 2026</a></p>
     <p>
   <br>
 

@@ -63,7 +63,7 @@
 \let\oldendverbatim\endverbatim
 \renewenvironment{verbatim}{\originalfootnotesize\oldverbatim}{\oldendverbatim}
 
-\title{\textbf{ZCOS}: \\
+\title{\textbf{OS.1}: \\
        \Large A Monolithic, Zero-Trust Architecture \\
        for Hardened Edge and Desktop Systems \\ }
 \author{BitEdits Engineering Group}
@@ -74,7 +74,7 @@
     linkcolor=blue,
     filecolor=magenta,
     urlcolor=cyan,
-    pdftitle={ZCOS Technical Whitepaper},
+    pdftitle={OS.1 Technical Whitepaper},
     pdfpagemode=FullScreen,
 }
 
@@ -85,7 +85,7 @@
   \color{white}\thispagestyle{empty}\vspace*{3cm}\centering
   {\Huge  \textbf{Zen Crypted Operating System} \par} \vspace{1.5cm}
   {\HUGE  \textbf{Технічне завдання} \par} \vspace{1.5cm}
-  {\LARGE \textbf{на розробку та впровадження \\ операційної системи ZCOS \\ з ядром Linux та бібліотеками BSD} \par} \vspace{1.5cm}
+  {\LARGE \textbf{на розробку та впровадження \\ операційної системи OS.1 \\ з ядром Linux та бібліотеками BSD} \par} \vspace{1.5cm}
   {\large На основі Технічних Вимог \par}
   {\large Згідно з Постановою КМУ № 205 від 21.02.2025 \par}
   {\large Формалізованих за стандартом ISO/IEC/IEEE 29148:2018 \par} \vfill
@@ -97,16 +97,16 @@
 \newpage
 
 \section{Introduction}
-ZCOS (internally designated as \textbf{zencrypted/os}) is a monolithic, zero-trust operating infrastructure designed for high-assurance computing. Modern operating systems suffer from bloated attack surfaces, architectural coupling with system management daemons (\texttt{systemd}), and complex boot chains vulnerable to physical and logical tampering.
+OS.1 (internally designated as \textbf{zencrypted/os}) is a monolithic, zero-trust operating infrastructure designed for high-assurance computing. Modern operating systems suffer from bloated attack surfaces, architectural coupling with system management daemons (\texttt{systemd}), and complex boot chains vulnerable to physical and logical tampering.
 
-By synthesizing an ultra-lightweight independent rootfs framework, an immutable Unified Kernel Image (UKI), declarative hardware sandboxing, and strict privilege isolation, ZCOS eliminates legacy attack vectors. The operating system boots directly from UEFI NVRAM into an encrypted memory-mapped environment, bypassing traditional bootloaders, and executing a sandboxed userspace governed by \texttt{musl-libc}, \texttt{toybox}, and the Landlock Linux Security Module (LSM).
+By synthesizing an ultra-lightweight independent rootfs framework, an immutable Unified Kernel Image (UKI), declarative hardware sandboxing, and strict privilege isolation, OS.1 eliminates legacy attack vectors. The operating system boots directly from UEFI NVRAM into an encrypted memory-mapped environment, bypassing traditional bootloaders, and executing a sandboxed userspace governed by \texttt{musl-libc}, \texttt{toybox}, and the Landlock Linux Security Module (LSM).
 
 \begin{center}
 \begin{tikzpicture}[
     node distance=0.5cm,
     layer/.style={rectangle, draw, fill=blue!5, text width=12cm, text centered, minimum height=0.3cm, rounded corners},
     arrow/.style={thick, ->, >=stealth}]
-    \node (os) [layer, fill=blue!15] {\textbf{ZCOS System Architecture}};
+    \node (os) [layer, fill=blue!15] {\textbf{OS.1 System Architecture}};
     \node (apps) [layer, below=of os] {Applications / ctwm $\rightarrow$ Landlock Policies / nftables / auditd};
     \node (user) [layer, below=of apps] {Core Userspace Engine $\rightarrow$ OpenRC / bitedits-toybox / OpenDoas};
     \node (kern) [layer, below=of user] {Immutable Runtime Kernel $\rightarrow$ Hardened Linux Kernel + eBPF Tracing};
@@ -118,10 +118,10 @@ By synthesizing an ultra-lightweight independent rootfs framework, an immutable 
 \end{center}
 
 \subsubsection*{Architectural Pillars}
-The design of ZCOS relies on four uncompromising principles:
+The design of OS.1 relies on four uncompromising principles:
 \begin{itemize}
     \item \textbf{Cryptographic Immutability:} The entire base operating system kernel, configuration matrix, and initial execution files reside in a single, cryptographically signed binary.
-    \item \textbf{Attack Surface Minimization:} Traditional distributions deploy up to several gigabytes of software. ZCOS strips the base rootfs down to its absolute mathematical minimum via custom forks (\texttt{bitedits/*}).
+    \item \textbf{Attack Surface Minimization:} Traditional distributions deploy up to several gigabytes of software. OS.1 strips the base rootfs down to its absolute mathematical minimum via custom forks (\texttt{bitedits/*}).
     \item \textbf{Process Isolation by Default:} Applications lack system-wide visibility. Access to the filesystem, network socket layers, and hardware inputs must be explicitly granted via declarative kernel policies.
     \item \textbf{State Separation:} The operating system treats runtime state as volatile. Persistent changes are restricted to dedicated, encrypted data blocks.
 \end{itemize}
@@ -138,7 +138,7 @@ The kernel configuration enforces:
 \section{Zen Crypted Operating System}
 
 \subsection{Secure Boot (\texttt{tpm2})}
-ZCOS eliminates legacy bootloaders (like GRUB) which are inherently vulnerable to tampering. Instead, the firmware directly executes an immutable Unified Kernel Image (UKI) via UEFI Secure Boot. This mechanism handles runtime decryption and initialization seamlessly.
+OS.1 eliminates legacy bootloaders (like GRUB) which are inherently vulnerable to tampering. Instead, the firmware directly executes an immutable Unified Kernel Image (UKI) via UEFI Secure Boot. This mechanism handles runtime decryption and initialization seamlessly.
 
 \begin{itemize}
     \item \textbf{Mechanism} --- UEFI, signed UKI, direct kernel loading, dm-crypt (initramfs)
@@ -187,7 +187,7 @@ The immutable \texttt{initramfs} instantiates a minimal storage driver stack to 
 At the core of the user environment is an ultra-minimalist root filesystem derived from Alpine Linux. By managing a dedicated downstream fork, we strictly control and minimize the surface area of the base distribution.
 
 \subsection{C Library (\texttt{musl})}
-An implementation of the standard library functionality described in the ISO C and POSIX standards, plus common extensions, built on top of the Linux system calls API. MUSLC is used in NuttX, Alpine, Chimera, and ZCOS.
+An implementation of the standard library functionality described in the ISO C and POSIX standards, plus common extensions, built on top of the Linux system calls API. MUSLC is used in NuttX, Alpine, Chimera, and OS.1.
 
 \subsection{Berkley Userland (\texttt{chimerautils})}
 All vital system utilities are provided by Alpine Toybox or Chimeratils BSD Userland. This establishes a hard breakpoint that separates the core system from monolithic dependencies while retaining absolute POSIX compliance.
@@ -198,7 +198,7 @@ All vital system utilities are provided by Alpine Toybox or Chimeratils BSD User
     box/.style={rectangle, draw, fill=gray!5, text width=3.8cm, text centered, minimum height=1.5cm, font=\small},
     root/.style={rectangle, draw, fill=blue!10, text width=6cm, text centered, minimum height=0.8cm, font=\bfseries}
 ]
-    \node (top) [root] {ZCOS Userspace};
+    \node (top) [root] {OS.1 Userspace};
     \node (mid) [box, below=of top, yshift=-0.3cm] {\textbf{bitedits/alpine}\\Package Database Layout};
     \node (left) [box, left=of mid] {\textbf{bitedits/toybox}\\POSIX Core Commands};
     \node (right) [box, right=of mid] {\textbf{bitedits/openrc}\\Deterministic Init};
@@ -221,7 +221,7 @@ All vital system tools (\texttt{ls}, \texttt{ps}, \texttt{cat}, \texttt{chmod}) 
 Hardware power states and performance governors are managed directly through native logic, eschewing heavy system daemons in favor of predictable, direct tuning mechanisms. Tooling relies on \texttt{acpi} and \texttt{cpupower}.
 
 \subsection{Time Server (\texttt{chrony})}
-Accurate, cryptographic synchronization is paramount to securing a zero-trust architecture. Chrony serves as an isolated NTP client ensuring that system timestamps remain rigorously validated against network tampering. Chrony is used in Alpine, Chimera and ZCOS.
+Accurate, cryptographic synchronization is paramount to securing a zero-trust architecture. Chrony serves as an isolated NTP client ensuring that system timestamps remain rigorously validated against network tampering. Chrony is used in Alpine, Chimera and OS.1.
 
 \subsection{Package Management (\texttt{apk})}
 Software lifecycle integrity is maintained via Alpine Package Keeper (APKv3). By utilizing deterministic builds and local offline signatures, we ensure a highly defensive supply chain architecture.
@@ -269,9 +269,9 @@ udp dport 123 accept # Allowed: chrony NTP Synctcp dport 443 accept # Allowed: O
 
 \newpage
 \subsection{Mandatory Access Control (\texttt{landlock})}
-Moving beyond convoluted policy frameworks, ZCOS deploys thread-level unprivileged sandboxing via Landlock. Processes must securely restrict their own filesystem access through strict declarative profiles.
+Moving beyond convoluted policy frameworks, OS.1 deploys thread-level unprivileged sandboxing via Landlock. Processes must securely restrict their own filesystem access through strict declarative profiles.
 
-Unlike legacy MAC systems (SELinux/AppArmor) which add complex policy layers and complex tooling, ZCOS implements process sandboxing natively:
+Unlike legacy MAC systems (SELinux/AppArmor) which add complex policy layers and complex tooling, OS.1 implements process sandboxing natively:
 \begin{itemize}
     \item \textbf{Mechanism:} Utilizing unprivileged sandboxing features, processes restrict their own filesystem actions and access paths.
     \item \textbf{Configuration:} The userspace engine utilizes \texttt{landlockconfig} to ingest declarative TOML rule structures at application initialization.
@@ -313,7 +313,7 @@ For administrative access loops, standard \texttt{sudo} is banned. The system re
 \subsection{Seat Devices (\texttt{seatd})}
 Input routing and hardware mediation are controlled by \texttt{seatd}. It securely permits graphical workspaces to access shared devices without elevating permissions to complex display manager suites.
 
-To operate a graphical workspace without a resource-heavy or complex display manager, ZCOS links input routing through \texttt{seatd}.
+To operate a graphical workspace without a resource-heavy or complex display manager, OS.1 links input routing through \texttt{seatd}.
 \begin{itemize}
 \item Grants application engines access to shared hardware interfaces (such as graphics cards or inputs) without requiring elevated \texttt{root} permissions.
 \item Avoids any dependency on large user tracking packages, maintaining a tiny security perimeter for input tracking.
@@ -328,10 +328,10 @@ The visual desktop layout is anchored by Claude's Tab Window Manager (\texttt{ct
 \end{itemize}
 
 \subsection{GStreamer (\texttt{gstreamer})}
-Handling complex multimedia pipelines is delegated to GStreamer. Running within strictly isolated contexts, it ensures robust audio and video processing while preventing codec-level exploits from compromising the broader system. GStreamer and PipeWire are supported in Chimera and ZCOS.
+Handling complex multimedia pipelines is delegated to GStreamer. Running within strictly isolated contexts, it ensures robust audio and video processing while preventing codec-level exploits from compromising the broader system. GStreamer and PipeWire are supported in Chimera and OS.1.
 
 \subsection{Erlang (\texttt{erlang})}
-For resilient, fault-tolerant network services and daemons, ZCOS embraces Erlang. Its battle-tested actor model and extreme concurrency provide an uncompromising foundation for highly available distributed architectures.
+For resilient, fault-tolerant network services and daemons, OS.1 embraces Erlang. Its battle-tested actor model and extreme concurrency provide an uncompromising foundation for highly available distributed architectures.
 
 \subsection{Elixir (\texttt{elixir})}
 Building atop the Erlang Virtual Machine, Elixir introduces modern developer tooling and extensibility. It accelerates the development of secure, scalable system services while inheriting the raw reliability of the underlying VM.
@@ -343,7 +343,7 @@ Building atop the Erlang Virtual Machine, Elixir introduces modern developer too
 \label{tab:comparative_matrix}
 \noindent\makebox[\textwidth][c]{
 \begin{tabular}{p{4.2cm} p{7cm} p{7cm}}
-\toprule\textbf{Security Parameter} & \textbf{Standard Enterprise Linux} & \textbf{ZCOS} \\
+\toprule\textbf{Security Parameter} & \textbf{Standard Enterprise Linux} & \textbf{OS.1} \\
 \midrule\textbf{Boot Mechanism} & UEFI $\rightarrow$ GRUB $\rightarrow$ Kernel $\rightarrow$ Initramfs & UEFI $\rightarrow$ Signed Monolithic UKI \\
 \addlinespace\textbf{Boot Surface Tampering} & Vulnerable (Unsigned configs/modules) & Impossible (Breaks Secure Boot Signature) \\
 \addlinespace\textbf{Core Utilities} & GNU Coreutils ($\sim$150MB, Complex) & \texttt{bitedits/toybox} ($<$5MB, Minimalist) \\
@@ -354,9 +354,9 @@ Building atop the Erlang Virtual Machine, Elixir introduces modern developer too
 }\end{table}
 
 \section{Conclusion}
-ZCOS proves that modern hardware systems can be decoupled from complex, legacy distribution frameworks.
+OS.1 proves that modern hardware systems can be decoupled from complex, legacy distribution frameworks.
 By consolidating the runtime layer inside an immutable Unified Kernel Image and enforcing strict sandboxing
-across minimal userspace forks, ZCOS delivers an uncompromised, zero-trust infrastructure optimized
+across minimal userspace forks, OS.1 delivers an uncompromised, zero-trust infrastructure optimized
 for high-assurance desktop layouts and isolated edge computation nodes.
 
 \end{document}

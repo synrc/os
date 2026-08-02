@@ -1,18 +1,77 @@
 
-zencrypted/os
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Security Admin BEAM                             (trusted security services) │
+│                                                                             │
+│ * Highest privilege, smallest surface                                       │
+│ * Owns all long-term keys, HSM/TPM interaction, signing, certificate CA     │
+│ * Communicates only with System BEAM over a single, capability-limited,     │
+│ * length-prefixed Unix-domain socket (or sealed distribution channel)       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ cd      - erpuno/cd      – storage mounts, names, cluster                   │
+│ os      - synrc/os       – core system services                             │
+│ ca      - synrc/ca       – certificate authority                            │
+│ ia      - zencrypted/ias - identity and authentication services             │
+│ ts      - synrc/ts       - TSS2 TPM 2.0 Linux HSM                           │
+│ kv      - synrc/kvs      - privileged CAS KV storage (aggregate)            │
+│ ldap    - synrc/ldap     – certificates, policy, auth, directory (aggreg.)  │
+│ abac    - erpuno/abac    – attribute based access control (aggregate)       │
+└─────────────────────────────────────────────────────────────────────────────┘
 
-Rootfs: https://www.alpinelinux.org — https://github.com/bitedits/alpine
-Boot Process: UEFI + signed UKI + direct kernel loading + dm-crypt (initramfs)
-Power: acpi + cpupower
-Packages: https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper – https://github.com/alpinelinux/apk-tools
-Auditing: https://github.com/bitedits/audit-userpace
-Tracing: https://ebpf.io, https://bpftrace.org — https://github.com/bpftrace/bpftrace
-RC.Init: https://docs.alpinelinux.org/user-handbook/0.1a/Working/openrc.html  — https://github.com/bitedits/openrc
-Users: OpenBSD user management for Linux – https://github.com/Duncaen/OpenDoas
-POSIX: http://landley.net/toybox/ – https://github.com/bitedits/toybox
-Seat: https://man.sr.ht/~kennylevinsen/seatd/ — https://github.com/bitedits/seatd
-WM: https://www.ctwm.org/index.html — https://github.com/bitedits/ctwm
-Firewall: https://www.netfilter.org/projects/nftables/index.html — https://git.netfilter.org/nftables/tree/
-MAC: https://landlock.io – https://github.com/landlock-lsm/landlockconfig/
-Time: https://chrony-project.org — https://github.com/mlichvar/chrony
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Admin BEAM                                    (privileged network services) │
+│                                                                             │
+│ * Capability broker, device open, mount, network config, policy             │
+│ * Never opens a graphical display or loads non IETF code                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ vpn     - zencrypted/vpn - tunnelling                                       │
+│ mqtt    - erpuno/mqtt    - brockering                                       │
+│ turn    - erpuno/turn    - streaming (STUN/TURN)                            │
+│ kvs     - synrc/kvs      - key-value storage based on iterators (aggregate) │
+└─────────────────────────────────────────────────────────────────────────────┘
 
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ERP.1 Information Systems Catalogue   (informational communication systems) │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ns      - synrc/ns       - DNSSEC name server                               │
+│ fs      - synrc/fs       - Linux, Windows, macOS file-system library        │
+│ x11     - bitedits/x11   – rootless Xorg / Xwayland / future Port           │
+│ wm      - bitedits/wm    – ctwm + OTP window-manager components             │
+│ gst     - zencrypted/rtp – GStreamer / PipeWire pipelines                   │
+│ edu     -                – LMS/EMS educational process management           │
+│ health  -                – HL7 dictionaries                                 │
+│ cart    -                – cartulary management framework                   │
+│ crm     - erpuno/crm     – document management system                       │
+│ acc     -                - ERP.1 apps could be bundled                      │
+│ wms     -                - ERP.1 apps could be bundled                      │
+│ ai      -                - LLM services, RAG vector database, RocksDB       │
+│ olap    -                - Analytics                                        │
+│ itsm    -                - IT service managements                           │
+│ pm      -                - as glorified monolith                            │
+│ scm     -                - supply chain management                          │
+│ plm     -                - product lifecycle management                     │
+│ chat    - synrc/chat     - instant messenger                                │
+│ rtp     -                - real time platform                               │
+│ bpmn    - synrc/bpmn     - business process management notation             │
+│ form    - synrc/form     - form management                                  │
+│ n2o     - synrc/n2o      - web-telecom framework, cache, session, ws ping   │
+│ nitro   - synrc/nitro    - declarative web framework                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ERP.1 Document Management System BEAM                   (dms-documents) pod │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ crm     -                – document management system                       │
+│ docx    -                – OpenXML template processor                       │
+│ katottg - erpuno/katottg – Ukrainian Locations Index                        │
+│ soa     -                - X-ROAD Trembita SOAP library                     │
+│ sevovv  -                – Ukrainian Governmental Mail Exchange Service Bus │
+│ erp     -                - ERP.1 unified enterprice schema (HL7 coverage)   │
+│ acc     -                - ERP.1 unified account employee HCM               │
+│ ocr     -                - Tesseract based OCR                              │
+│ scan    -                - HTML5 based client and F# web server             │
+│ abac    -                - attribute base access control (local copy)       │
+│ chat    -                - instant messenger                                │
+│ bpmn    -                - business process management notation             │
+│ form    -                - form management                                  │
+│ nitro   -                - declarative web framework                        │
+└─────────────────────────────────────────────────────────────────────────────┘

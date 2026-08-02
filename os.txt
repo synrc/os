@@ -1,3 +1,14 @@
+OS.1
+====
+
+* Security Plane
+* Control Plane
+* Examples
+
+Security Plane
+--------------
+
+Security Plane: OS, CA, VPN, LDAP, IAS, ABAC
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Security Admin BEAM                             (trusted security services) │
@@ -7,15 +18,21 @@
 │ * Communicates only with System BEAM over a single, capability-limited,     │
 │ * length-prefixed Unix-domain socket (or sealed distribution channel)       │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ cd      - erpuno/cd      – storage mounts, names, cluster                   │
-│ os      - synrc/os       – core system services                             │
-│ ca      - synrc/ca       – certificate authority                            │
-│ ia      - zencrypted/ias - identity and authentication services             │
+│ cd      - erpuno/cd      - storage mounts, names, cluster                   │
+│ os      - synrc/os       - core system services                             │
+│ ca      - synrc/ca       - certificate authority                            │
+│ ias     - zencrypted/ias - identity and authentication services             │
 │ ts      - synrc/ts       - TSS2 TPM 2.0 Linux HSM                           │
-│ kv      - synrc/kvs      - privileged CAS KV storage (aggregate)            │
-│ ldap    - synrc/ldap     – certificates, policy, auth, directory (aggreg.)  │
-│ abac    - erpuno/abac    – attribute based access control (aggregate)       │
+│ kvs     - synrc/kvs      - privileged CAS KV storage (aggregate)            │
+│ vpn     - zencrypted/vpn - tunnelling                                       │
+│ ldap    - synrc/ldap     - certificates, policy, auth, directory (aggreg.)  │
+│ abac    - erpuno/abac    - attribute based access control (aggregate)       │
 └─────────────────────────────────────────────────────────────────────────────┘
+
+Control Plane
+-------------
+
+Control Planes: Storage, Services (SoA, buses), Protocols
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Admin BEAM                                    (privileged network services) │
@@ -23,55 +40,104 @@
 │ * Capability broker, device open, mount, network config, policy             │
 │ * Never opens a graphical display or loads non IETF code                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ vpn     - zencrypted/vpn - tunnelling                                       │
 │ mqtt    - erpuno/mqtt    - brockering                                       │
 │ turn    - erpuno/turn    - streaming (STUN/TURN)                            │
+│ rest    - synrc/rest     - HTTP API                                         │
+│ asn1    - synrc/asn1     - ASN.1 API                                        │
+│ rpc     - synrc/rpc      - BERT API                                         │
+│ x422    - zencrypted/protocol - X.422 API                                   │
 │ kvs     - synrc/kvs      - key-value storage based on iterators (aggregate) │
 └─────────────────────────────────────────────────────────────────────────────┘
 
+Examples
+--------
+
+Example 1. Chat Messenger
+
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ ERP.1 Information Systems Catalogue   (informational communication systems) │
+│ ERP.1 Сhat Messenger BEAM (v2)                         (chat-messenger) pod │
 ├─────────────────────────────────────────────────────────────────────────────┤
+│ asn1    - synrc/asn1     - Synrc ASN.1 Compiler                             │
 │ ns      - synrc/ns       - DNSSEC name server                               │
-│ fs      - synrc/fs       - Linux, Windows, macOS file-system library        │
-│ x11     - bitedits/x11   – rootless Xorg / Xwayland / future Port           │
-│ wm      - bitedits/wm    – ctwm + OTP window-manager components             │
-│ gst     - zencrypted/rtp – GStreamer / PipeWire pipelines                   │
-│ edu     -                – LMS/EMS educational process management           │
-│ health  -                – HL7 dictionaries                                 │
-│ cart    -                – cartulary management framework                   │
-│ crm     - erpuno/crm     – document management system                       │
-│ acc     -                - ERP.1 apps could be bundled                      │
-│ wms     -                - ERP.1 apps could be bundled                      │
-│ ai      -                - LLM services, RAG vector database, RocksDB       │
-│ olap    -                - Analytics                                        │
-│ itsm    -                - IT service managements                           │
-│ pm      -                - as glorified monolith                            │
-│ scm     -                - supply chain management                          │
-│ plm     -                - product lifecycle management                     │
+│ ca      - synrc/ca       - certificate authority                            │
+│ ias     - zencrypted/ias - identity and authentication services             │
+│ ldap    - synrc/ldap     - certificates, policy, auth, directory (aggreg.)  │
+│ abac    - erpuno/abac    - attribute based access control (aggregate)       │
 │ chat    - synrc/chat     - instant messenger                                │
-│ rtp     -                - real time platform                               │
+│ rtp     - zencrypted/rtp - real time processing (WebRTC)                    │
+│ gst     - zencrypted/rtp - GStreamer / PipeWire pipelines                   │
+│ bpmn    - synrc/bpmn     - business process management notation             │
+│ mqtt    - erpuno/mqtt    - brockering                                       │
+│ turn    - erpuno/turn    - streaming (STUN/TURN)                            │
+│ form    - synrc/form     - form management                                  │
+│ n2o     - synrc/n2o      - web-telecom framework, cache, session, ws ping   │
+│ nitro   - synrc/nitro    - declarative web framework                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Example 1. Document Management System
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ERP.1 Document Management System BEAM (v3)              (dms-documents) pod │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ crm     - erpuno/crm     - document management system                       │
+│ docx    - erpuno/docx    - OpenXML template processor                       │
+│ katottg - erpuno/katottg - Ukrainian Locations Index                        │
+│ soa     - erpuno/soa     - X-ROAD Trembita SOAP library                     │
+│ sevovv  - erpuno/sevovv  - Ukrainian Governmental Mail Exchange Service Bus │
+│ erp     - erpuno/schema  - ERP.1 unified enterprice schema (HL7 coverage)   │
+│ acc     - erpuno/acc     - ERP.1 unified account employee HCM               │
+│ ocr     - erpuno/ocr     - Tesseract based OCR                              │
+│ scan    - erpuno/scan    - HTML5 based client and F# web server             │
+│ abac    - erpuno/abac    - attribute base access control (local copy)       │
+│ chat    - synrc/chat     - instant messenger                                │
 │ bpmn    - synrc/bpmn     - business process management notation             │
 │ form    - synrc/form     - form management                                  │
 │ n2o     - synrc/n2o      - web-telecom framework, cache, session, ws ping   │
 │ nitro   - synrc/nitro    - declarative web framework                        │
 └─────────────────────────────────────────────────────────────────────────────┘
 
+Example 3. Infosec Utilities
+
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ ERP.1 Document Management System BEAM                   (dms-documents) pod │
+│ Infosec BEAM                                     (isolated sanbox services) │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ crm     -                – document management system                       │
-│ docx    -                – OpenXML template processor                       │
-│ katottg - erpuno/katottg – Ukrainian Locations Index                        │
-│ soa     -                - X-ROAD Trembita SOAP library                     │
-│ sevovv  -                – Ukrainian Governmental Mail Exchange Service Bus │
-│ erp     -                - ERP.1 unified enterprice schema (HL7 coverage)   │
-│ acc     -                - ERP.1 unified account employee HCM               │
-│ ocr     -                - Tesseract based OCR                              │
-│ scan    -                - HTML5 based client and F# web server             │
-│ abac    -                - attribute base access control (local copy)       │
-│ chat    -                - instant messenger                                │
-│ bpmn    -                - business process management notation             │
-│ form    -                - form management                                  │
-│ nitro   -                - declarative web framework                        │
+│ rt      - bitedits/rt    - NuttX POSIX RTOS                                 │
+│ skynet  - bitedits/skynet - Drone Swarm Control Plane X.422.1               │
+│ be      - bitedits/be    - Binary Editor with Disassemblers                 │
+│ tv      - bitedits/tv    - Ternimal Vision Text Editor in C99               │
+│ sh      - bitedits/sh    - Formal POSIX shell                               │
+│ mad     - synrc/nad      - Synrc Erlang Package Manager                     │
+│ pie     - 5HT/pie        - Pie Editor in Erlang                             │
 └─────────────────────────────────────────────────────────────────────────────┘
+
+Example 4. ERP.1 Demo Disc
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ERP.1 Information Systems Catalogue   (informational communication systems) │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ edu     - erpuno/edu     - LMS/EMS educational process management           │
+│ health  - erpuno/hl7     - HL7 dictionaries                                 │
+│ cart    - erpuno/cart    - cartulary management framework                   │
+│ crm     - erpuno/crm     - document management system                       │
+│ acc     - erpuno/acc     - ERP.1 apps could be bundled                      │
+│ wms     - erpuno/wms     - ERP.1 apps could be bundled                      │
+│ ai      - erpuno/ai      - LLM services, RAG vector database, RocksDB       │
+│ olap    - erpuno/olap    - Analytics                                        │
+│ itsm    - erpuno/itsm    - IT service managements                           │
+│ pm      - erpuno/pm      - as glorified monolith                            │
+│ scm     - erpuno/scm     - supply chain management                          │
+│ plm     - erpuno/plm     - product lifecycle management                     │
+│ chat    - synrc/chat     - instant messenger                                │
+│ bpmn    - synrc/bpmn     - business process management notation             │
+│ form    - synrc/form     - form management                                  │
+│ n2o     - synrc/n2o      - web-telecom framework, cache, session, ws ping   │
+│ nitro   - synrc/nitro    - declarative web framework                        │
+│ ns      - synrc/ns       - DNSSEC name server                               │
+│ fs      - synrc/fs       - Linux, Windows, macOS file-system library        │
+│ x11     - bitedits/x11   - rootless Xorg / Xwayland / future Port           │
+│ wm      - bitedits/wm    - ctwm + OTP window-manager components             │
+│ rtp     - zencrypted/rtp - real time processing (WebRTC)                    │
+│ gst     - zencrypted/rtp - GStreamer / PipeWire pipelines                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+* Namdak Tonpa

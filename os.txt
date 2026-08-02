@@ -3,50 +3,84 @@ OS.1
 
 * Security Plane
 * Control Plane
+* Application Plane
 * Examples
 
 Security Plane
 --------------
 
-Security Plane: OS, CA, VPN, LDAP, IAS, ABAC
+Security Plane: pure Trusted Security Services (long-term keys only)
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ Security Admin BEAM                             (trusted security services) │
+│ Security Admin BEAM                             (Trusted Security Services) │
 │                                                                             │
-│ * Highest privilege, smallest surface                                       │
-│ * Owns all long-term keys, HSM/TPM interaction, signing, certificate CA     │
-│ * Communicates only with System BEAM over a single, capability-limited,     │
-│ * length-prefixed Unix-domain socket (or sealed distribution channel)       │
+│ * Highest privilege, absolute minimal surface                               │
+│ * Owns all long-term keys, HSM/TPM, root & intermediate CAs                 │
+│ * Never opens network sockets, devices (except TPM/HSM), or mounts          │
+│ * Communicates exclusively with Control Plane over one sealed,              │
+│   capability-limited, length-prefixed Unix-domain socket                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ cd      - erpuno/cd      - storage mounts, names, cluster                   │
-│ os      - synrc/os       - core system services                             │
-│ ca      - synrc/ca       - certificate authority                            │
-│ ias     - zencrypted/ias - identity and authentication services             │
-│ tss     - synrc/tss      - TSS2 TPM 2.0 Linux HSM                           │
-│ kvs     - synrc/kvs      - privileged CAS KV storage (aggregate)            │
-│ vpn     - zencrypted/vpn - tunnelling                                       │
-│ ldap    - synrc/ldap     - certificates, policy, auth, directory (aggreg.)  │
-│ abac    - erpuno/abac    - attribute based access control (aggregate)       │
+│ ca      - synrc/ca       - certificate authority (root + intermediates)     │
+│ tss     - synrc/tss      - TSS2 TPM 2.0 / hardware crypto / attestation     │
+│ kvs     - synrc/kvs      - sealed key & certificate storage only            │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 Control Plane
 -------------
 
-Control Planes: Storage, Services (SoA, buses), Protocols
+Control Plane: privileged system & capability services
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ Admin BEAM                                    (privileged network services) │
+│ System Admin BEAM                               (privileged control plane)  │
 │                                                                             │
-│ * Capability broker, device open, mount, network config, policy             │
-│ * Never opens a graphical display or loads non IETF code                    │
+│ * Sole owner of kernel operations, devices, seats, mounts, network config   │
+│ * Capability broker (open → ioctl → SCM_RIGHTS)                             │
+│ * Requests all cryptographic operations from Security Admin BEAM            │
+│ * Never holds long-term private keys                                        │
+│ * Never opens graphical displays or loads untrusted application code        │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ mqtt    - erpuno/mqtt    - brockering                                       │
-│ turn    - erpuno/turn    - streaming (STUN/TURN)                            │
+│ os      - synrc/os       - core system services, power, time, audit         │
+│ cd      - erpuno/cd      - cluster, names, storage mounts                   │
+│ seat    - bitedits/seat  - seatd + device capability grants                 │
+│ land    - bitedits/land  - Landlock profile enforcement                     │
+│ net     - bitedits/net   - nftables, routing, firewall                      │
+│ vpn     - zencrypted/vpn - tunnelling                                       │
+│ mqtt    - erpuno/mqtt    - broker                                           │
+│ turn    - erpuno/turn    - STUN/TURN streaming                              │
 │ rest    - synrc/rest     - HTTP API                                         │
-│ asn1    - synrc/asn1     - ASN.1 API                                        │
-│ rpc     - synrc/rpc      - BERT API                                         │
-│ x422    - zencrypted/protocol - X.422 API                                   │
-│ kvs     - synrc/kvs      - key-value storage based on iterators (aggregate) │
+│ asn1    - synrc/asn1     - ASN.1                                            │
+│ rpc     - synrc/rpc      - BERT                                             │
+│ x422    - zencrypted/x422- X.422 protocol                                   │
+│ ias     - zencrypted/ias - identity & authentication (uses TSS)             │
+│ ldap    - synrc/ldap     - directory (uses TSS)                             │
+│ abac    - erpuno/abac    - attribute-based access control (uses TSS)        │
+│ kvs     - synrc/kvs      - privileged volume & CAS storage                  │
+│ bridge  - synrc/bridge   - authenticated channels to Application BEAMs      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Application Plane
+-----------------
+
+Application Plane: untrusted domain & session BEAMs (one per seat / domain)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Application BEAM(s)                         (unprivileged session / domain) │
+│                                                                             │
+│ * Receive only short-lived keys & certificates via capability grants        │
+│ * Host X11, window manager, media, and all business logic                   │
+│ * Communicate only through the Control Plane bridge                         │
+│ * Subject to full namespaces + cgroups + seccomp + Landlock                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ x11     - bitedits/x11   - rootless Xorg / Xwayland / Port                  │
+│ wm      - bitedits/wm    - ctwm + OTP window-manager components             │
+│ fs      - synrc/fs       - file-system event listener                       │
+│ gst     - zencrypted/gst - GStreamer / PipeWire pipelines                   │
+│ rtp     - zencrypted/rtp - real-time media (WebRTC)                         │
+│ chat    - synrc/chat     - instant messenger                                │
+│ bpmn    - synrc/bpmn     - business process management                      │
+│ form    - synrc/form     - form management                                  │
+│ n2o     - synrc/n2o      - web-telecom framework                            │
+│ nitro   - synrc/nitro    - declarative web framework                        │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 Examples
@@ -110,34 +144,216 @@ Example 3. Infosec Utilities
 │ pie     - 5HT/pie        - Pie Editor in Erlang                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-Example 4. ERP.1 Demo Disc
-
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ ERP.1 Information Systems Catalogue   (informational communication systems) │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ edu     - erpuno/edu     - LMS/EMS educational process management           │
-│ health  - erpuno/hl7     - HL7 dictionaries                                 │
-│ cart    - erpuno/cart    - cartulary management framework                   │
-│ crm     - erpuno/crm     - document management system                       │
-│ acc     - erpuno/acc     - ERP.1 apps could be bundled                      │
-│ wms     - erpuno/wms     - ERP.1 apps could be bundled                      │
-│ ai      - erpuno/ai      - LLM services, RAG vector database, RocksDB       │
-│ olap    - erpuno/olap    - Analytics                                        │
-│ itsm    - erpuno/itsm    - IT service managements                           │
-│ pm      - erpuno/pm      - as glorified monolith                            │
-│ scm     - erpuno/scm     - supply chain management                          │
-│ plm     - erpuno/plm     - product lifecycle management                     │
-│ chat    - synrc/chat     - instant messenger                                │
-│ bpmn    - synrc/bpmn     - business process management notation             │
-│ form    - synrc/form     - form management                                  │
-│ n2o     - synrc/n2o      - web-telecom framework, cache, session, ws ping   │
-│ nitro   - synrc/nitro    - declarative web framework                        │
-│ ns      - synrc/ns       - DNSSEC name server                               │
-│ fs      - synrc/fs       - Linux, Windows, macOS file-system library        │
-│ x11     - bitedits/x11   - rootless Xorg / Xwayland / future Port           │
-│ wm      - bitedits/wm    - ctwm + OTP window-manager components             │
-│ rtp     - zencrypted/rtp - real time processing (WebRTC)                    │
-│ gst     - zencrypted/rtp - GStreamer / PipeWire pipelines                   │
-└─────────────────────────────────────────────────────────────────────────────┘
-
 * Namdak Tonpa
+
+OS.1  NIST SP 800-53 Rev.5  ATTESTATION  (base controls .1+)
+===============================================================================
+
+Security Plane     = Security Admin BEAM   (tss, ca, sealed kvs)
+Control Plane      = System Admin BEAM     (os, seat, net, abac, ias ...)
+Application Plane  = Application BEAM(s)   (domain + session workloads)
+
+Legend:  [S] Security Admin BEAM
+         [C] System Admin BEAM
+         [A] Application BEAM
+         [K] Kernel / UKI / Landlock / cgroups (outer boundary)
+         [+] Fully attested by architecture
+         [~] Partially attested (requires operational procedure)
+         [-] Not addressed by BEAM taxonomy alone
+
+-------------------------------------------------------------------------------
+ACCESS CONTROL (AC)
+-------------------------------------------------------------------------------
+AC-1  Policy and Procedures .................... [+]  documented in CMDB
+AC-2  Account Management ....................... [+]  [C] ias + abac
+AC-3  Access Enforcement ....................... [+]  [C] abac + Landlock [K]
+AC-4  Information Flow Enforcement ............. [+]  [S]->[C]->[A] capability
+AC-5  Separation of Duties ..................... [+]  three distinct planes
+AC-6  Least Privilege .......................... [+]  [S] minimal TCB, [C]/[A]
+AC-7  Unsuccessful Logon Attempts .............. [+]  [C] ias
+AC-8  System Use Notification .................. [~]  [A] session banner
+AC-14 Permitted Actions w/o Identification ..... [+]  none (mTLS mandatory)
+AC-17 Remote Access ............................ [+]  [C] vpn + mTLS
+AC-18 Wireless Access .......................... [+]  [C] net (nftables drop)
+AC-19 Access Control for Mobile ................ [+]  [C] device grants only
+AC-20 Use of External Systems .................. [+]  [C] capability broker
+AC-21 Information Sharing ...................... [+]  [C] abac attributes
+AC-22 Publicly Accessible Content .............. [+]  none by default
+AC-24 Access Control Decisions ................. [+]  [C] abac (uses [S])
+AC-25 Reference Monitor ........................ [+]  [C] + [K] Landlock/seccomp
+
+-------------------------------------------------------------------------------
+AUDIT AND ACCOUNTABILITY (AU)
+-------------------------------------------------------------------------------
+AU-1  Policy and Procedures .................... [+]  CMDB + itsm
+AU-2  Event Logging ............................ [+]  [C] ias -> kvs
+AU-3  Content of Audit Records ................. [+]  [C] full context + HMAC
+AU-4  Audit Log Storage Capacity ............... [~]  [C] kvs sizing policy
+AU-5  Response to Audit Logging Process Failures [+]  fail-secure (operation aborts)
+AU-6  Audit Record Review, Analysis, Reporting . [+]  [C] -> SIEM (Wazuh)
+AU-7  Audit Record Reduction and Report Gen. ... [+]  [C] ias reports
+AU-8  Time Stamps .............................. [+]  [C] os_time (Chrony)
+AU-9  Protection of Audit Information .......... [+]  [C] kvs append-only + Kupyna
+AU-10 Non-repudiation .......................... [+]  [S] TSA + [C] signed events
+AU-11 Audit Record Retention ................... [~]  operational policy
+AU-12 Audit Record Generation .................. [+]  [C] real-time, fail-secure
+
+-------------------------------------------------------------------------------
+ASSESSMENT, AUTHORIZATION, AND MONITORING (CA)
+-------------------------------------------------------------------------------
+CA-1  Policy and Procedures .................... [+]  CMDB
+CA-2  Control Assessments ...................... [+]  synrc/ca TeX generation
+CA-3  Information Exchange ..................... [+]  [C] mTLS + capability
+CA-5  Plan of Action and Milestones (POA&M) .... [~]  itsm tracking
+CA-6  Authorization ............................ [+]  L3 profile signed by [S]
+CA-7  Continuous Monitoring .................... [+]  Wazuh + Zabbix + CMDB
+CA-8  Penetration Testing ...................... [~]  annual, external
+CA-9  Internal System Connections .............. [+]  [C] mTLS only
+
+-------------------------------------------------------------------------------
+CONFIGURATION MANAGEMENT (CM)
+-------------------------------------------------------------------------------
+CM-1  Policy and Procedures .................... [+]  CMDB as code
+CM-2  Baseline Configuration ................... [+]  [C] Elixir CMDB modules
+CM-3  Configuration Change Control ............. [+]  Git + signed releases
+CM-4  Impact Analyses .......................... [~]  process
+CM-5  Access Restrictions for Change ........... [+]  [C] privileged only
+CM-6  Configuration Settings ................... [+]  hardened baselines
+CM-7  Least Functionality ...................... [+]  OTP releases only (R3)
+CM-8  System Component Inventory ............... [+]  [C] CMDB hw.ex/sys.ex
+CM-9  Configuration Management Plan ............. [+]  Git + CI + CMDB
+CM-10 Software Usage Restrictions .............. [+]  signed OTP only
+CM-11 User-Installed Software .................. [+]  rejected by loader
+CM-14 Signed Components ........................ [+]  [S] ca signatures
+
+-------------------------------------------------------------------------------
+CONTINGENCY PLANNING (CP)
+-------------------------------------------------------------------------------
+CP-1  Policy and Procedures .................... [+]  documented
+CP-2  Contingency Plan ......................... [+]  OTP supervision trees
+CP-3  Contingency Training ..................... [~]  operational
+CP-4  Contingency Plan Testing ................. [~]  operational
+CP-7  Alternate Processing Site ................ [+]  [C] cluster (cd)
+CP-8  Telecommunications Services .............. [+]  [C] vpn + mqtt
+CP-9  System Backup ............................ [+]  [C] kvs replication
+CP-10 System Recovery and Reconstitution ....... [+]  hot code upgrade + restart
+
+-------------------------------------------------------------------------------
+IDENTIFICATION AND AUTHENTICATION (IA)
+-------------------------------------------------------------------------------
+IA-1  Policy and Procedures .................... [+]  CMDB
+IA-2  Identification and Authentication ........ [+]  [C] ias MFA (cert + OTP)
+IA-3  Device Identification and Authentication . [+]  [C] seat + [S] TPM quotes
+IA-4  Identifier Management .................... [+]  [C] ias
+IA-5  Authenticator Management ................. [+]  [S] ca + HSM
+IA-6  Authenticator Feedback ................... [+]  [C] ias
+IA-7  Cryptographic Module Authentication ...... [+]  [S] tss (FIPS/HSM)
+IA-8  Identification and Authentication (Non-Org)[+]  [C] federation (SAML/OIDC)
+IA-11 Re-authentication ........................ [+]  [C] ias session policy
+IA-12 Identity Proofing ........................ [~]  process + [S] ca
+
+-------------------------------------------------------------------------------
+MEDIA PROTECTION (MP)
+-------------------------------------------------------------------------------
+MP-1  Policy and Procedures .................... [+]  CMDB
+MP-2  Media Access ............................. [+]  [C] kvs + Landlock
+MP-3  Media Marking ............................ [~]  operational
+MP-4  Media Storage ............................ [+]  [C] encrypted kvs
+MP-5  Media Transport .......................... [+]  [C] encrypted backups
+MP-6  Media Sanitization ....................... [~]  procedure
+MP-7  Media Use ................................ [+]  [K] USB blocked by default
+
+-------------------------------------------------------------------------------
+PHYSICAL AND ENVIRONMENTAL PROTECTION (PE)
+-------------------------------------------------------------------------------
+PE-1 .. PE-9, PE-11 .. PE-18 ................... [~]  facility controls
+                                                         (outside BEAM taxonomy)
+
+-------------------------------------------------------------------------------
+PLANNING (PL) / PROGRAM MANAGEMENT (PM)
+-------------------------------------------------------------------------------
+PL-1  Policy and Procedures .................... [+]  CMDB + L1/L2/L3 profiles
+PL-2  System Security and Privacy Plans ........ [+]  generated from CMDB
+PL-4  Rules of Behavior ........................ [~]  organizational
+PL-8  Security and Privacy Architectures ....... [+]  three-plane taxonomy
+PM-1 .. PM-32 (selected) ....................... [~]  organizational / CMDB
+
+-------------------------------------------------------------------------------
+RISK ASSESSMENT (RA)
+-------------------------------------------------------------------------------
+RA-1  Policy and Procedures .................... [+]  CMDB
+RA-2  Security Categorization .................. [+]  L1/L2/L3 profiles
+RA-3  Risk Assessment .......................... [+]  CMDB risk.ex
+RA-5  Vulnerability Monitoring and Scanning .... [+]  Wazuh + CI SBOM
+RA-7  Risk Response ............................ [~]  POA&M via itsm
+
+-------------------------------------------------------------------------------
+SYSTEM AND SERVICES ACQUISITION (SA)
+-------------------------------------------------------------------------------
+SA-1  Policy and Procedures .................... [+]  CMDB
+SA-3  System Development Life Cycle ............ [+]  signed OTP + Git
+SA-4  Acquisition Process ...................... [~]  process
+SA-8  Security and Privacy Engineering ......... [+]  least privilege planes
+SA-10 Developer Configuration Management ....... [+]  Git + signed releases
+SA-11 Developer Testing and Evaluation ......... [+]  CI + attestation
+SA-12 Supply Chain Protection .................. [+]  SBOM + [S] signatures
+SA-15 Development Process, Standards, Tools .... [+]  Elixir/OTP + CMDB
+SA-17 Developer Security Architecture .......... [+]  documented taxonomy
+
+-------------------------------------------------------------------------------
+SYSTEM AND COMMUNICATIONS PROTECTION (SC)
+-------------------------------------------------------------------------------
+SC-1  Policy and Procedures .................... [+]  CMDB
+SC-2  Separation of System / User Functionality  [+]  [C] vs [A]
+SC-3  Security Function Isolation .............. [+]  [S] pure crypto plane
+SC-4  Information in Shared Resources .......... [+]  no ambient sharing
+SC-5  Denial-of-Service Protection ............. [+]  [C] net + cgroups
+SC-7  Boundary Protection ...................... [+]  [C] nftables + vpn
+SC-8  Transmission Confidentiality/Integrity ... [+]  mTLS 1.3 + DSTU
+SC-12 Cryptographic Key Establishment/Mgmt ..... [+]  [S] ca + tss/HSM
+SC-13 Cryptographic Protection ................. [+]  [S] + [C] short-lived
+SC-17 Public Key Infrastructure Certificates ... [+]  [S] ca
+SC-20 / SC-21 / SC-22 (DNS/PKI) ................ [+]  [C] ns + [S] ca
+SC-23 Session Authenticity ..................... [+]  [C] ias + mTLS
+SC-28 Protection of Information at Rest ........ [+]  [C] kvs + Kalyna
+SC-39 Process Isolation ........................ [+]  BEAM + [K] namespaces
+SC-45 System Time Synchronization .............. [+]  [C] os_time (Chrony)
+
+-------------------------------------------------------------------------------
+SYSTEM AND INFORMATION INTEGRITY (SI)
+-------------------------------------------------------------------------------
+SI-1  Policy and Procedures .................... [+]  CMDB
+SI-2  Flaw Remediation ......................... [+]  signed hot upgrades
+SI-3  Malicious Code Protection ................ [+]  Wazuh HIDS + SBOM
+SI-4  System Monitoring ........................ [+]  Wazuh + Zabbix
+SI-7  Software, Firmware, Information Integrity  [+]  UKI + [S] signatures
+SI-10 Information Input Validation ............. [+]  [A] schema validation
+SI-16 Memory Protection ........................ [+]  BEAM + [K]
+
+-------------------------------------------------------------------------------
+SUPPLY CHAIN RISK MANAGEMENT (SR)
+-------------------------------------------------------------------------------
+SR-1  Policy and Procedures .................... [+]  CMDB
+SR-2  Supply Chain Risk Management Plan ........ [+]  documented
+SR-3  Supply Chain Controls and Processes ...... [+]  open-source + SBOM
+SR-4  Provenance ............................... [+]  [S] signatures + CMDB
+SR-5  Acquisition Strategies ................... [~]  process
+SR-6  Supplier Assessments and Reviews ......... [~]  process
+SR-11 Component Authenticity ................... [+]  [S] + serial CMDB
+
+===============================================================================
+SUMMARY
+-------------------------------------------------------------------------------
+Total base controls examined ................... [~110]
+Fully attested by architecture [+] ............. [~85]
+Partially attested / process-dependent [~] ..... [~20]
+Outside pure BEAM taxonomy [-/PE] .............. [~5].
+
+Strongest families : AC, IA, SC, CM, AU, SI, SR
+Requires operational closure : CP testing, PE, some RA/SA process controls
+
+Attestation generated from OS.1 three-plane taxonomy
+(Security Admin BEAM / System Admin BEAM / Application BEAM)
+against NIST SP 800-53 Revision 5 base controls.
+===============================================================================
+

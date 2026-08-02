@@ -22,7 +22,7 @@ Security Plane: OS, CA, VPN, LDAP, IAS, ABAC
 │ os      - synrc/os       - core system services                             │
 │ ca      - synrc/ca       - certificate authority                            │
 │ ias     - zencrypted/ias - identity and authentication services             │
-│ ts      - synrc/ts       - TSS2 TPM 2.0 Linux HSM                           │
+│ tss     - synrc/tss      - TSS2 TPM 2.0 Linux HSM                           │
 │ kvs     - synrc/kvs      - privileged CAS KV storage (aggregate)            │
 │ vpn     - zencrypted/vpn - tunnelling                                       │
 │ ldap    - synrc/ldap     - certificates, policy, auth, directory (aggreg.)  │

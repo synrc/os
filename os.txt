@@ -20,9 +20,10 @@ Security Plane: pure Trusted Security Services (long-term keys only)
 │ * Communicates exclusively with Control Plane over one sealed,              │
 │   capability-limited, length-prefixed Unix-domain socket                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ ca      - synrc/ca       - certificate authority (root + intermediates)     │
 │ tss     - synrc/tss      - TSS2 TPM 2.0 / hardware crypto / attestation     │
 │ kvs     - synrc/kvs      - sealed key & certificate storage only            │
+│ ca      - synrc/ca       - certificate authority (root + intermediates)     │
+│ au      - synrc/au       - high-assurance audit logging (signing keys)      │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 Control Plane
@@ -73,6 +74,8 @@ Application Plane: untrusted domain & session BEAMs (one per seat / domain)
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ x11     - bitedits/x11   - rootless Xorg / Xwayland / Port                  │
 │ wm      - bitedits/wm    - ctwm + OTP window-manager components             │
+│ mad     - synrc/mad      - Synrc Erlang Package Manager                     │
+│ pie     - 5HT/pie        - Pie Editor in Erlang                             │
 │ fs      - synrc/fs       - file-system event listener                       │
 │ gst     - zencrypted/gst - GStreamer / PipeWire pipelines                   │
 │ rtp     - zencrypted/rtp - real-time media (WebRTC)                         │
@@ -94,6 +97,7 @@ Example 1. Chat Messenger
 │ asn1    - synrc/asn1     - Synrc ASN.1 Compiler                             │
 │ ns      - synrc/ns       - DNSSEC name server                               │
 │ ca      - synrc/ca       - certificate authority                            │
+│ au      - synrc/au       - high-assurance audit logging (signing keys)      │
 │ ias     - zencrypted/ias - identity and authentication services             │
 │ ldap    - synrc/ldap     - certificates, policy, auth, directory (aggreg.)  │
 │ abac    - erpuno/abac    - attribute based access control (aggregate)       │
@@ -123,6 +127,8 @@ Example 1. Document Management System
 │ ocr     - erpuno/ocr     - Tesseract based OCR                              │
 │ scan    - erpuno/scan    - HTML5 based client and F# web server             │
 │ abac    - erpuno/abac    - attribute base access control (local copy)       │
+│ ca      - synrc/ca       - certificate authority                            │
+│ au      - synrc/au       - high-assurance audit logging (signing keys)      │
 │ chat    - synrc/chat     - instant messenger                                │
 │ bpmn    - synrc/bpmn     - business process management notation             │
 │ form    - synrc/form     - form management                                  │
@@ -140,8 +146,6 @@ Example 3. Infosec Utilities
 │ be      - bitedits/be    - Binary Editor with Disassemblers                 │
 │ tv      - bitedits/tv    - Ternimal Vision Text Editor in C99               │
 │ sh      - bitedits/sh    - Formal POSIX shell                               │
-│ mad     - synrc/nad      - Synrc Erlang Package Manager                     │
-│ pie     - 5HT/pie        - Pie Editor in Erlang                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 * Namdak Tonpa
@@ -149,7 +153,7 @@ Example 3. Infosec Utilities
 OS.1  NIST SP 800-53 Rev.5  ATTESTATION  (base controls .1+)
 ===============================================================================
 
-Security Plane     = Security Admin BEAM   (tss, ca, sealed kvs)
+Security Plane     = Security Admin BEAM   (tss, ca, au, sealed kvs)
 Control Plane      = System Admin BEAM     (os, seat, net, abac, ias ...)
 Application Plane  = Application BEAM(s)   (domain + session workloads)
 

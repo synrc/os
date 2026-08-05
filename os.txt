@@ -1,10 +1,42 @@
 OS.1
 ====
 
-* Security Plane
-* Control Plane
-* Application Plane
-* Examples
+* [O] System Plane
+* [S] Security Plane
+* [C] Control Plane
+* [A] Application Plane
+* [E] Examples
+
+System Plane
+------------
+
+System Plane: OS provides hardware abstraction layer.
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ System Plane C99                                 (Trusted Operating System) │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ tpm2      - bitedits/tpm2      - Secure Boot                                │
+│ limine    - bitedits/limine    - Limine Bootloader                          │
+│ edk2      - bitedits/edk2      - TianoCore EDK II                           │
+│ rootfs    - bitedits/roofs     - Unified Kernel Image (UKI) Construction    │
+│ muscl     - bitedits/musl      - C Library                                  │
+│ bsdutils  - bitedits/bsdutils  - Berkley Userland                           │
+│ toybox    - bitedits/toybox    - POSIX Engine                               │
+│ acpi      - bitedits/acpi      - Power Tools                                │
+│ chrony    - bitedits/chrony    - Time Server                                │
+│ apk       - bitedits/apk       - Package Management                         │
+│ audit     - bitedits/audit     - Auditing Userspace                         │
+│ bpftrace  - bitedits/bpftrace  - eBPF System observability                  │
+│ nftables  - bitedits/nftables  - Network Firewall                           │
+│ landlock  - bitedits/landlock  - Mandatory Access Control                   │
+│ openrc    - bitedits/openrc    - Init Supervisor                            │
+│ doas      - bitedits/doas      - User Privileges                            │
+│ seat      - bitedits/seat      - Seat Devices                               │
+│ ctwm      - bitedits/ctwn      - Window Manager                             │
+│ gstreamer - bitedits/gstreamer - GStreamer                                  │
+│ erlang    - bitedits/erlang    - Ericsson Erlang                            │
+│ elixir    - bitedits/elixir    - Platformatec Business DSL                  │
+└─────────────────────────────────────────────────────────────────────────────┘
 
 Security Plane
 --------------
@@ -20,10 +52,10 @@ Security Plane: pure Trusted Security Services (long-term keys only)
 │ * Communicates exclusively with Control Plane over one sealed,              │
 │   capability-limited, length-prefixed Unix-domain socket                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ tss     - synrc/tss      - TSS2 TPM 2.0 / hardware crypto / attestation     │
-│ kvs     - synrc/kvs      - sealed key & certificate storage only            │
-│ ca      - synrc/ca       - certificate authority (root + intermediates)     │
-│ au      - synrc/au       - high-assurance audit logging (signing keys)      │
+│ tss      - synrc/tss       - TSS2 TPM 2.0 / hardware crypto / attestation   │
+│ kvs      - synrc/kvs       - sealed key & certificate storage only          │
+│ ca       - synrc/ca        - certificate authority (root + intermediates)   │
+│ au       - synrc/au        - high-assurance audit logging (signing keys)    │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 Control Plane
@@ -103,7 +135,7 @@ Example 1. Chat Messenger
 │ abac    - erpuno/abac    - attribute based access control (aggregate)       │
 │ chat    - synrc/chat     - instant messenger                                │
 │ rtp     - zencrypted/rtp - real time processing (WebRTC)                    │
-│ gst     - zencrypted/rtp - GStreamer / PipeWire pipelines                   │
+│ gst     - zencrypted/gst - GStreamer / PipeWire pipelines                   │
 │ bpmn    - synrc/bpmn     - business process management notation             │
 │ mqtt    - erpuno/mqtt    - brockering                                       │
 │ turn    - erpuno/turn    - streaming (STUN/TURN)                            │

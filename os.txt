@@ -1,16 +1,104 @@
-OS.1
-====
+OS.1 – Synrc Operating System
+=============================
 
-* [O] System Plane
-* [S] Security Plane
-* [C] Control Plane
-* [A] Application Plane
-* [E] Examples
+* [1]. Threat Model
+* [2]. Architectural Principles
+* [3]. Planes
+* [4]. Component Catalog
+* [5]. Communication & Capability Model
+* [6]. Example Deployments
+* [7]. NIST SP 800-53 Rev. 5 Attestation
+* [8]. Gaps & Operational Requirements
+* [9]. Glossary & References
 
-System Plane
-------------
+## 1. Threat Model
 
-System Plane: OS provides hardware abstraction layer.
+OS.1 is a minimal, high-assurance operating system designed for
+regulated, sovereign, and high-security environments.
+
+It optimises for:
+
+* Absolute isolation of long-term cryptographic material
+* Capability-based authority (no ambient authority)
+* Formal auditability and non-repudiation
+* Small, inspectable TCB
+* Erlang/OTP supervision and hot upgrade semantics
+
+Threat model and hardening posture:
+
+* Compromised application code or libraries
+  - Application Plane is fully sandboxed (namespaces + cgroups + seccomp + Landlock). No long-term secrets ever reach it.
+
+* Network-facing service compromise
+  - Only Control Plane has network. Security Plane has zero sockets.
+
+* Privilege escalation (Application → Control or Control → Security)
+  - Capability broker + sealed Unix socket + ABAC. No ambient authority.
+
+* Long-term private key extraction
+  - Keys live only in Security Plane (or external HSM). Never leave.
+
+* Unauthorised device or mount access
+  - Control Plane is sole owner of devices/mounts. Granted only via SCM_RIGHTS after ABAC decision.
+
+* Supply-chain injection of unsigned components
+  - UKI + signed OTP releases + SBOM + [S] signatures.
+
+* Physical attacks on the host
+  - Discrete TPM (not fTPM) preferred; firmware measured at boot.
+  - Full-disk encryption with keys sealed to PCR state (TPM).
+  - Chassis intrusion detection fed into early-boot PCR extend.
+  - External ports (USB, Thunderbolt, etc.) disabled or gated by physical presence + Control Plane policy.
+  - Security Plane can run on a separate physical board / PCIe card with its own TPM when threat model requires it.
+
+* Side-channel attacks on the CPU
+  - Security Plane pinned to isolated core(s); SMT/hyperthreading disabled on those cores.
+  - Constant-time implementations mandatory for all crypto in [S].
+  - Memory encryption (TME/SME or equivalent) enabled when hardware supports it.
+  - No shared page cache or huge pages between Security Plane and any other plane.
+
+* Compromised TPM / HSM firmware
+  - Dual-root design: primary TPM + optional external HSM.
+  - TPM firmware measurement and remote attestation of the TPM itself.
+  - Critical CA operations require threshold / multi-party approval (m-of-n) before the Security Plane will sign.
+  - Offline root key ceremony; online Security Plane holds only intermediate keys when possible.
+  - Continuous PCR monitoring + external attestation service.
+
+* Social engineering of operators
+  - No single operator can extract or use long-term keys.
+  - Sensitive operations (root CA, key export, policy change) require dual control (two independent authenticated operators).
+  - Operator authentication is hardware-backed (FIDO2 / smartcard + PIN) and bound to the Control Plane session.
+  - Break-glass procedures exist but are heavily audited and time- delayed; they cannot bypass the Security Plane socket policy.
+  - All operator actions are signed and append-only logged.
+
+## 2. Architectural Principles
+
+* Three mutually distrusting planes with strict privilege separation
+* Security Plane owns every long-term secret; never touches the network
+* Control Plane is the sole capability broker and kernel operator
+* Application Plane is completely untrusted and heavily sandboxed
+* All inter-plane communication is explicit, capability-mediated, and audited
+* Hardware root of trust (TPM 2.0) + UKI + Landlock + namespaces + cgroups + seccomp
+* Base OS layer is Alpine/Chimera compatible (musl + BSD userland)
+* C99 components are integrated into the BEAM as NIFs
+* Runtime unit is an Erlang BEAM (can run as VM, OCI container, or pod)
+
+## 3. Planes
+
+### Runtime model
+
+Each plane runs as one or more Erlang BEAM instances.
+These BEAMs may be placed in a VM, an OCI container, or a pod.
+C99 system components are compiled as NIFs and loaded into the
+appropriate BEAM. The underlying OS is Alpine/Chimera-based.
+
+### Boot / attestation flow
+
+TPM 2.0 → Secure Boot (Limine / EDK2) → Unified Kernel Image (UKI)
+- Operating System (zero)
+- Security Admin BEAM (first)
+- System Admin BEAM (second)
+- Application BEAM per seat / domain
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ System Plane C99                                 (Trusted Operating System) │
@@ -18,30 +106,25 @@ System Plane: OS provides hardware abstraction layer.
 │ tpm2      - bitedits/tpm2      - Secure Boot                                │
 │ limine    - bitedits/limine    - Limine Bootloader                          │
 │ edk2      - bitedits/edk2      - TianoCore EDK II                           │
-│ rootfs    - bitedits/roofs     - Unified Kernel Image (UKI) Construction    │
-│ muscl     - bitedits/musl      - C Library                                  │
-│ bsdutils  - bitedits/bsdutils  - Berkley Userland                           │
+│ rootfs    - bitedits/rootfs    - Unified Kernel Image (UKI) Construction    │
+│ musl      - bitedits/musl      - C Library                                  │
+│ bsdutils  - bitedits/bsdutils  - Berkeley Userland                          │
 │ toybox    - bitedits/toybox    - POSIX Engine                               │
 │ acpi      - bitedits/acpi      - Power Tools                                │
 │ chrony    - bitedits/chrony    - Time Server                                │
 │ apk       - bitedits/apk       - Package Management                         │
 │ audit     - bitedits/audit     - Auditing Userspace                         │
-│ bpftrace  - bitedits/bpftrace  - eBPF System observability                  │
+│ bpftrace  - bitedits/bpftrace  - eBPF System Observability                  │
 │ nftables  - bitedits/nftables  - Network Firewall                           │
 │ landlock  - bitedits/landlock  - Mandatory Access Control                   │
 │ openrc    - bitedits/openrc    - Init Supervisor                            │
 │ doas      - bitedits/doas      - User Privileges                            │
 │ seat      - bitedits/seat      - Seat Devices                               │
-│ ctwm      - bitedits/ctwn      - Window Manager                             │
+│ ctwm      - bitedits/ctwm      - Window Manager                             │
 │ gstreamer - bitedits/gstreamer - GStreamer                                  │
 │ erlang    - bitedits/erlang    - Ericsson Erlang                            │
 │ elixir    - bitedits/elixir    - Platformatec Business DSL                  │
 └─────────────────────────────────────────────────────────────────────────────┘
-
-Security Plane
---------------
-
-Security Plane: pure Trusted Security Services (long-term keys only)
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Security Admin BEAM                             (Trusted Security Services) │
@@ -57,11 +140,6 @@ Security Plane: pure Trusted Security Services (long-term keys only)
 │ ca       - synrc/ca        - certificate authority (root + intermediates)   │
 │ au       - synrc/au        - high-assurance audit logging (signing keys)    │
 └─────────────────────────────────────────────────────────────────────────────┘
-
-Control Plane
--------------
-
-Control Plane: privileged system & capability services
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ System Admin BEAM                               (privileged control plane)  │
@@ -91,11 +169,6 @@ Control Plane: privileged system & capability services
 │ bridge  - synrc/bridge   - authenticated channels to Application BEAMs      │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-Application Plane
------------------
-
-Application Plane: untrusted domain & session BEAMs (one per seat / domain)
-
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Application BEAM(s)                         (unprivileged session / domain) │
 │                                                                             │
@@ -118,13 +191,33 @@ Application Plane: untrusted domain & session BEAMs (one per seat / domain)
 │ nitro   - synrc/nitro    - declarative web framework                        │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-Examples
---------
+## 4. Component Catalog
 
-Example 1. Chat Messenger
+(See the three-plane diagrams above. All listed repositories are owned
+by the author. The lists are exhaustive for the current design.)
+
+## 5. Communication & Capability Model
+
+* Security <> Control.
+  Single sealed, capability-limited, length-prefixed Unix-domain socket.
+  Security Plane never initiates connections. Control Plane may request
+  cryptographic operations (sign, decrypt, attest, issue short-lived cert).
+  No other channels exist.
+
+* Control <> Application.
+  Authenticated bridge service (synrc/bridge).
+  Application BEAMs receive only short-lived keys and certificates.
+  Device, mount, and network capabilities are granted via SCM_RIGHTS
+  after ABAC decision. No direct kernel or device access is possible.
+
+All capability grants and cryptographic operations are audited (append-only, HMAC + signature by Security Plane).
+
+## 6. Example Deployments
+
+### Example 1. Chat Messenger
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ ERP.1 Сhat Messenger BEAM (v2)                         (chat-messenger) pod │
+│ ERP.1 Chat Messenger BEAM (v2)                         (chat-messenger) pod │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ asn1    - synrc/asn1     - Synrc ASN.1 Compiler                             │
 │ ns      - synrc/ns       - DNSSEC name server                               │
@@ -137,14 +230,14 @@ Example 1. Chat Messenger
 │ rtp     - zencrypted/rtp - real time processing (WebRTC)                    │
 │ gst     - zencrypted/gst - GStreamer / PipeWire pipelines                   │
 │ bpmn    - synrc/bpmn     - business process management notation             │
-│ mqtt    - erpuno/mqtt    - brockering                                       │
+│ mqtt    - erpuno/mqtt    - brokering                                        │
 │ turn    - erpuno/turn    - streaming (STUN/TURN)                            │
 │ form    - synrc/form     - form management                                  │
 │ n2o     - synrc/n2o      - web-telecom framework, cache, session, ws ping   │
 │ nitro   - synrc/nitro    - declarative web framework                        │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-Example 1. Document Management System
+### Example 2. Document Management System
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ ERP.1 Document Management System BEAM (v3)              (dms-documents) pod │
@@ -154,7 +247,7 @@ Example 1. Document Management System
 │ katottg - erpuno/katottg - Ukrainian Locations Index                        │
 │ soa     - erpuno/soa     - X-ROAD Trembita SOAP library                     │
 │ sevovv  - erpuno/sevovv  - Ukrainian Governmental Mail Exchange Service Bus │
-│ erp     - erpuno/schema  - ERP.1 unified enterprice schema (HL7 coverage)   │
+│ erp     - erpuno/schema  - ERP.1 unified enterprise schema (HL7 coverage)   │
 │ acc     - erpuno/acc     - ERP.1 unified account employee HCM               │
 │ ocr     - erpuno/ocr     - Tesseract based OCR                              │
 │ scan    - erpuno/scan    - HTML5 based client and F# web server             │
@@ -168,26 +261,23 @@ Example 1. Document Management System
 │ nitro   - synrc/nitro    - declarative web framework                        │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-Example 3. Infosec Utilities
+### Example 3. Infosec Utilities
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ Infosec BEAM                                     (isolated sanbox services) │
+│ Infosec BEAM                                     (isolated sandbox services) │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ rt      - bitedits/rt    - NuttX POSIX RTOS                                 │
 │ skynet  - bitedits/skynet - Drone Swarm Control Plane X.422.1               │
 │ be      - bitedits/be    - Binary Editor with Disassemblers                 │
-│ tv      - bitedits/tv    - Ternimal Vision Text Editor in C99               │
+│ tv      - bitedits/tv    - Terminal Vision Text Editor in C99               │
 │ sh      - bitedits/sh    - Formal POSIX shell                               │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-* Namdak Tonpa
-
-OS.1  NIST SP 800-53 Rev.5  ATTESTATION  (base controls .1+)
-===============================================================================
+## 7. NIST SP 800-53 Rev. 5 Attestation
 
 Security Plane     = Security Admin BEAM   (tss, ca, au, sealed kvs)
 Control Plane      = System Admin BEAM     (os, seat, net, abac, ias ...)
-Application Plane  = Application BEAM(s)   (domain + session workloads)
+Application Plane  = Application BEAM      (domain + session workloads)
 
 Legend:  [S] Security Admin BEAM
          [C] System Admin BEAM
@@ -205,7 +295,7 @@ AC-2  Account Management ....................... [+]  [C] ias + abac
 AC-3  Access Enforcement ....................... [+]  [C] abac + Landlock [K]
 AC-4  Information Flow Enforcement ............. [+]  [S]->[C]->[A] capability
 AC-5  Separation of Duties ..................... [+]  three distinct planes
-AC-6  Least Privilege .......................... [+]  [S] minimal TCB, [C]/[A]
+AC-6  Least Privilege .......................... [+]  [S] minimal TCB, [C] + [A]
 AC-7  Unsuccessful Logon Attempts .............. [+]  [C] ias
 AC-8  System Use Notification .................. [~]  [A] session banner
 AC-14 Permitted Actions w/o Identification ..... [+]  none (mTLS mandatory)
@@ -303,7 +393,6 @@ MP-7  Media Use ................................ [+]  [K] USB blocked by default
 PHYSICAL AND ENVIRONMENTAL PROTECTION (PE)
 -------------------------------------------------------------------------------
 PE-1 .. PE-9, PE-11 .. PE-18 ................... [~]  facility controls
-                                                         (outside BEAM taxonomy)
 
 -------------------------------------------------------------------------------
 PLANNING (PL) / PROGRAM MANAGEMENT (PM)
@@ -377,19 +466,48 @@ SR-5  Acquisition Strategies ................... [~]  process
 SR-6  Supplier Assessments and Reviews ......... [~]  process
 SR-11 Component Authenticity ................... [+]  [S] + serial CMDB
 
-===============================================================================
-SUMMARY
--------------------------------------------------------------------------------
+### SUMMARY
+
 Total base controls examined ................... [~110]
 Fully attested by architecture [+] ............. [~85]
 Partially attested / process-dependent [~] ..... [~20]
-Outside pure BEAM taxonomy [-/PE] .............. [~5].
+Outside pure BEAM taxonomy [-/PE] .............. [~5]
 
 Strongest families : AC, IA, SC, CM, AU, SI, SR
 Requires operational closure : CP testing, PE, some RA/SA process controls
 
-Attestation generated from OS.1 three-plane taxonomy
+Attestation generated from OS.1 taxonomy
 (Security Admin BEAM / System Admin BEAM / Application BEAM)
 against NIST SP 800-53 Revision 5 base controls.
-===============================================================================
 
+## 8. Gaps & Operational Requirements
+
+Items marked [~] require organisational process, not pure architecture:
+
+* Contingency training and testing (CP-3, CP-4)
+* Physical / environmental controls (PE family)
+* Some media handling procedures (MP-3, MP-6)
+* Impact analysis and acquisition process formality (CM-4, SA-4, SR-5/6)
+* Identity proofing workflow (IA-12)
+* Audit retention policy and log sizing (AU-4, AU-11)
+* Annual external penetration testing (CA-8)
+
+These are deliberately left to the operator. The architecture itself
+does not claim to solve them.
+
+## 9. Glossary & References
+
+BEAM          Erlang virtual machine
+NIF           Native Implemented Function (C99 inside BEAM)
+UKI           Unified Kernel Image
+Landlock      Linux mandatory access control (unprivileged)
+SCM_RIGHTS    Unix credential / file-descriptor passing
+TSS           TPM Software Stack
+ABAC          Attribute-Based Access Control
+IAS           Identity & Authentication Service
+CMDB          Configuration Management Database (Elixir modules)
+Kupyna/Kalyna Ukrainian national cryptographic standards
+DSTU          Ukrainian national standards
+
+Copyrigh (c) Cryptographic Telesystems, LLC.
+All repositories owned by the author.

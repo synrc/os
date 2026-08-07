@@ -27,19 +27,24 @@ It optimises for:
 Threat model and hardening posture:
 
 * Compromised application code or libraries
-  - Application Plane is fully sandboxed (namespaces + cgroups + seccomp + Landlock). No long-term secrets ever reach it.
+  - Application Plane is fully sandboxed (namespaces + cgroups + seccomp + landlock).
+  - No long-term secrets ever reach it.
 
 * Network-facing service compromise
-  - Only Control Plane has network. Security Plane has zero sockets.
+  - Only Control Plane has network.
+  - Security Plane has zero sockets.
 
 * Privilege escalation (Application → Control or Control → Security)
-  - Capability broker + sealed Unix socket + ABAC. No ambient authority.
+  - Capability broker + sealed Unix socket + ABAC
+  - No ambient authority.
 
 * Long-term private key extraction
-  - Keys live only in Security Plane (or external HSM). Never leave.
+  - Keys live only in Security Plane (or external HSM).
+  - Never leave.
 
 * Unauthorised device or mount access
-  - Control Plane is sole owner of devices/mounts. Granted only via SCM_RIGHTS after ABAC decision.
+  - Control Plane is sole owner of devices/mounts.
+  - Granted only via SCM_RIGHTS after ABAC decision.
 
 * Supply-chain injection of unsigned components
   - UKI + signed OTP releases + SBOM + [S] signatures.
@@ -95,10 +100,11 @@ appropriate BEAM. The underlying OS is Alpine/Chimera-based.
 ### Boot / attestation flow
 
 TPM 2.0 → Secure Boot (Limine / EDK2) → Unified Kernel Image (UKI)
-- Operating System (zero)
-- Security Admin BEAM (first)
-- System Admin BEAM (second)
-- Application BEAM per seat / domain
+
+* Operating System (zero)
+* Security Admin BEAM (first)
+* System Admin BEAM (second)
+* Application BEAM per seat / domain
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ System Plane C99                                 (Trusted Operating System) │
@@ -138,6 +144,7 @@ TPM 2.0 → Secure Boot (Limine / EDK2) → Unified Kernel Image (UKI)
 │ tss      - synrc/tss       - TSS2 TPM 2.0 / hardware crypto / attestation   │
 │ kvs      - synrc/kvs       - sealed key & certificate storage only          │
 │ ca       - synrc/ca        - certificate authority (root + intermediates)   │
+│ cm       - synrc/cm        - configuration database                         │
 │ au       - synrc/au        - high-assurance audit logging (signing keys)    │
 └─────────────────────────────────────────────────────────────────────────────┘
 
